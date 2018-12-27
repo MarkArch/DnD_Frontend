@@ -45,6 +45,7 @@ export class GridComponent implements OnInit {
   constructor() { }
 
   public gridSettingVisible = false;
+  public tooltip = 'Current HP 37%';
   public gridDimension = 3;
   public x: number = 15;
   public y: number = 15;

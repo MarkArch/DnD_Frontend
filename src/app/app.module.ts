@@ -41,7 +41,6 @@ import { AppRoutingModule } from './app.routing';
 // Import 3rd party components
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { CampaignSelectComponent } from './views/campaign-select/campaign-select.component';
 
 @NgModule({
@@ -58,7 +57,6 @@ import { CampaignSelectComponent } from './views/campaign-select/campaign-select
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
-    ChartsModule
   ],
   declarations: [
     AppComponent,
