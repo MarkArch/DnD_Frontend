@@ -10,10 +10,10 @@
   <div class="card-body">
     <div class="col-md-8 col-lg-8 float-left over">
       <div [hidden]="!gridSettingVisible" class="card p-2">
-        <h5>Set your squares numbers: <input class="HPdim" type="number" [(ngModel)]="x" value="x" (ngModelChange)="onGridInit()">
+        <h5>Set squares number: <input class="HPdim" type="number" [(ngModel)]="x" value="x" (ngModelChange)="onGridInit()">
           X
           <input class="HPdim" type="number" [(ngModel)]="y" value="y" (ngModelChange)="onGridInit()">
-          <span class="float-right">Set your squares dimension: 
+          <span class="float-right">Set squares dimension: 
           <input type="range" min="1" max="4" value="gridDimension" class="slider" [(ngModel)]="gridDimension" value="gridDimension"></span></h5>
       </div>
       <table class="border separate">
@@ -27,10 +27,10 @@
     <div class="col-md-4 col-lg-4 float-right">
       <tabset>
         <tab>
-          <ng-template tabHeading><i></i> Combat Overview</ng-template>
+          <ng-template tabHeading><i></i>Overview</ng-template>
           <h4 class="text-center">Nome_PG</h4>
           <div class="row">
-            <div class="col-md-7 col-lg-7 float-left">
+            <div class="col-xl-7 float-left" style="overflow:hidden">
               <table class="mb-3 table-striped">
                 <thead>
                   <tr>
@@ -55,7 +55,7 @@
                 </tbody>
               </table>
             </div>
-            <div class="col-md-5 col-lg-5 text-center highFont">
+            <div class="col-xl-5 text-center highFont">
               <p class="pt-3 font-weight-bold mb-2">Current HP</p>
               <p><input class="HPdim" type="number" value="18" style="direction: rtl"> / 30</p>
               <p class="pt-2 font-weight-bold mb-2">Current MP</p>
@@ -104,7 +104,7 @@
                 <button class="btn btn-block btn-ghost-submit active" type="button">Next turn</button>
               </div>
               <div class="col-md-6 col-lg-6">
-                <button class="btn btn-block btn-ghost-warning active" type="button">Go back, error ci fu</button>
+                <button class="btn btn-block btn-ghost-warning active" type="button">Go back</button>
               </div>
             </div>
             <div class="row">
@@ -124,7 +124,7 @@
           </div>
         </tab>
         <tab>
-          <ng-template tabHeading><i></i>Note & Dices</ng-template>
+          <ng-template tabHeading><i></i>Note/Dices</ng-template>
           <div class="text-center">
             <h4><i class="fas fa-edit pb-3"></i> Write your notes</h4>
             <textarea class="form-control" cols="30" rows="10" placeholder="Insert your notes here"></textarea>
@@ -153,7 +153,7 @@
           </div>
         </tab>
         <tab>
-          <ng-template tabHeading><i></i>Buff/Debuff</ng-template>
+          <ng-template tabHeading><i></i>Buffs</ng-template>
           To be implemented...
         </tab>
       </tabset>
