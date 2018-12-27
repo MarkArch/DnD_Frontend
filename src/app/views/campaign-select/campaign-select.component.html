@@ -1,0 +1,41 @@
+<div class="card m-4">
+  <div class="card-header text-center">
+    <h3>Select your campaign</h3>
+  </div>
+  <div class="row">
+    <div class="col-4 p-5" *ngFor="let i of x">
+      <div class="card">
+        <div class="card-body row">
+          <div class="col-4 clickable border-right" (click)="openModal(template)">
+            <img style="width: 100%; height: auto;" src="assets/img/campIcon/alchemy.svg">
+          </div>
+          <div class="col-8 clickable text-center" (click)="openModal(template)">
+            <h6>Campaign name</h6>
+            <p>Campagna di Flavio</p>
+            <h6>Dungeon Master</h6>
+            <p>Purtroppo Flavio</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Campagna di Flavio: select your character</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="card" *ngFor="let i of x">
+      <div class="card-body row p-2">
+        <div class="col-3 border-right clickable" (click)="onSelectCharacter()"><i class="fas fa-dragon"></i></div>
+        <div class="col-3 text-center clickable" (click)="onSelectCharacter()"><h6>Name: </h6> Talis</div>
+        <div class="col-3 text-center clickable" (click)="onSelectCharacter()"><h6>Race: </h6> Elf</div>
+        <div class="col-3 text-center clickable" (click)="onSelectCharacter()"><h6>LV: </h6> 9</div>
+      </div>
+    </div>
+  </div>
+</ng-template>

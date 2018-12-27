@@ -1,0 +1,162 @@
+<div class="card">
+  <div class="card-header"> Combat - Grid
+    <div class="card-header-actions">
+      <label class="switch switch-sm switch-label switch-pill switch-outline-primary-alt mb-0 mr-2 align-middle">
+        <input type="checkbox" class="switch-input" (click)="onShowGridSettings()">
+        <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+      </label> <span class="align-middle"> Grid Settings </span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="col-md-8 col-lg-8 float-left over">
+      <div [hidden]="!gridSettingVisible" class="card p-2">
+        <h5>Set your squares numbers: <input class="HPdim" type="number" [(ngModel)]="x" value="x" (ngModelChange)="onGridInit()">
+          X
+          <input class="HPdim" type="number" [(ngModel)]="y" value="y" (ngModelChange)="onGridInit()">
+          <span class="float-right">Set your squares dimension: 
+          <input type="range" min="1" max="4" value="gridDimension" class="slider" [(ngModel)]="gridDimension" value="gridDimension"></span></h5>
+      </div>
+      <table class="border separate">
+        <tr [@gridAnimation]="gridDimension" class="grid border" *ngFor="let row of yAxis; let y = index">
+          <td [@gridAnimation]="gridDimension" class="grid border" *ngFor="let col of xAxis; let x = index">
+            0
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="col-md-4 col-lg-4 float-right">
+      <tabset>
+        <tab>
+          <ng-template tabHeading><i></i> Combat Overview</ng-template>
+          <h4 class="text-center">Nome_PG</h4>
+          <div class="row">
+            <div class="col-md-7 col-lg-7 float-left">
+              <table class="mb-3 table-striped">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th class="pl-2 pb-1">Value</th>
+                    <th class="pl-2 pb-1">Mod</th>
+                    <th class="pl-2 pb-1">Temp</th>
+                    <th class="pl-2 pb-1">Tot</th>
+                    <th class="pl-2 pb-1 pr-1">TS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let val of stats; let i = index">
+                    <td class="text-center left-radius">{{val.name}}</td>
+                    <td class="text-center">{{val.value}}</td>
+                    <td class="text-center">{{val.modifier > 0 ? "+" : ""}}{{val.modifier}}</td>
+                    <td class="text-center"><input class="dim" type="number" name="temp" [(ngModel)]="val.tempValue"
+                        value="{{val.tempValue}}" (change)="onTempModify(i)"></td>
+                    <td class="text-center">{{val.totValue > 0 ? "+" : ""}}{{val.totValue}}</td>
+                    <td class="text-center right-radius"><i class="far fa-star"></i></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-5 col-lg-5 text-center highFont">
+              <p class="pt-3 font-weight-bold mb-2">Current HP</p>
+              <p><input class="HPdim" type="number" value="18" style="direction: rtl"> / 30</p>
+              <p class="pt-2 font-weight-bold mb-2">Current MP</p>
+              <p>XXX / XXX</p>
+            </div>
+          </div>
+          <div class="text-center">
+            <span class="font-weight-bold">Profiency bonus: </span> <span> +4</span>
+            <span class="ml-5 font-weight-bold">Armor Class: </span> <span> 19</span>
+          </div>
+          <table class="mt-3 maxWidth">
+            <thead>
+              <tr>
+                <th class="text-center">Weapon</th>
+                <th class="text-center">Modifier</th>
+                <th class="text-center">Damage</th>
+                <th class="text-center">Tot Bonus</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-center">Spada Lunga</td>
+                <td class="text-center">+1</td>
+                <td class="text-center">d8</td>
+                <td class="text-center">XX</td>
+              </tr>
+            </tbody>
+          </table>
+          <hr>
+          <div class="text-center">
+            <h4>Characters</h4>
+            <table class=" m-2 p1 maxWidth">
+              <tr *ngFor="let row of stats">
+                <td class="pr-2 pl-2 pb-1 text-center"><i class="fas fa-caret-right"></i></td>
+                <td class="pr-2 pl-2 pb-1 text-center highFont"> Ignazio </td>
+                <td class="pr-2 pl-2 pb-1 text-center highFont">22</td>
+                <td class="pr-2 pl-2 pb-1 text-center highFont">(Des: 13)</td>
+                <td class="pr-2 pl-2 pb-1 text-center"><button class="btn btn-block btn-sm btn-outline-primary" type="button"><i
+                      class="fas fa-pen"></i></button></td>
+                <td class="pr-2 pl-2 pb-2 text-center"><button class="btn btn-block btn-sm btn-outline-danger" type="button"><i
+                      class="fas fa-trash-alt"></i></button></td>
+              </tr>
+            </table>
+            <div class="row pb-4">
+              <div class="col-md-6 col-lg-6">
+                <button class="btn btn-block btn-ghost-submit active" type="button">Next turn</button>
+              </div>
+              <div class="col-md-6 col-lg-6">
+                <button class="btn btn-block btn-ghost-warning active" type="button">Go back, error ci fu</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-5 col-lg-5 pr-1">
+                <input type="text" class="form-control" placeholder="Add a character">
+              </div>
+              <div class="col-md-2 col-lg-2 pl-1 pr-1">
+                <input type="number" class="form-control" placeholder="Init">
+              </div>
+              <div class="col-md-2 col-lg-2 pl-1 pr-1">
+                <input type="number" class="form-control" placeholder="Des">
+              </div>
+              <div class="col-md-3 col-lg-3">
+                <button class="btn btn-block btn-ghost-success active" type="button">Add</button>
+              </div>
+            </div>
+          </div>
+        </tab>
+        <tab>
+          <ng-template tabHeading><i></i>Note & Dices</ng-template>
+          <div class="text-center">
+            <h4><i class="fas fa-edit pb-3"></i> Write your notes</h4>
+            <textarea class="form-control" cols="30" rows="10" placeholder="Insert your notes here"></textarea>
+            <div class="row pb-3 pt-3">
+              <div class="col-md-6 col-lg-6">
+                <button class="btn btn-block btn-ghost-success active" type="button">Save</button>
+              </div>
+              <div class="col-md-6 col-lg-6">
+                <button class="btn btn-block btn-ghost-danger active" type="button">Reset</button>
+              </div>
+            </div>
+            <hr>
+            <h4><i class="fas fa-dice pb-2"></i> Dices</h4>
+            <table class="maxWidth">
+              <tbody>
+                <tr *ngFor="let icon of diceArray; let i = index">
+                  <td><img style="width: 26px; height: auto;" src="assets/img/brand/{{icon.name}}" alt=""></td>
+                  <td>{{icon.type}}</td>
+                  <td>X <input class="HPdim" type="number" [(ngModel)]="icon.number" value="icon.number"></td>
+                  <td class="pr-3"> = {{icon.value}} </td>
+                  <td><button class="btn btn-block btn-sm btn-outline-primary" type="button" (click)="onDiceThrow(i)">Throw</button></td>
+                  <td><button class="btn btn-block btn-sm btn-outline-danger" type="button" (click)="onDiceReset(i)">Reset</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </tab>
+        <tab>
+          <ng-template tabHeading><i></i>Buff/Debuff</ng-template>
+          To be implemented...
+        </tab>
+      </tabset>
+    </div>
+  </div>
+</div>
