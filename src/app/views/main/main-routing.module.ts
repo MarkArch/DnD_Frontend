@@ -3,6 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { HomeComponent } from './home/home.component';
 import { GridComponent } from './grid/grid.component';
+import { DiaryComponent } from './diary/diary.component';
+import { SheetComponent } from './sheet/sheet.component';
 
 const routes: Routes = [
   {
@@ -18,6 +20,14 @@ const routes: Routes = [
   {
     path: 'grid',
     component: GridComponent,
+  },
+  {
+    path: 'diary',
+    component: DiaryComponent,
+  },
+  {
+    path: 'sheet',
+    component: SheetComponent,
   }
 ];
 
