@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 import { HomeComponent } from './home/home.component';
 import { MainRoutingModule } from './main-routing.module';
@@ -16,7 +17,8 @@ import { DiaryComponent } from './diary/diary.component';
     MainRoutingModule,
     CommonModule,
     TabsModule.forRoot(),
-    TooltipModule.forRoot()
+    TooltipModule.forRoot(),
+    CKEditorModule
   ],
   declarations: [ 
     HomeComponent, 
