@@ -2,6 +2,9 @@ import { Component, OnInit, TemplateRef, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { postlogin } from '../../class/postlogin';
+import { SharedVariableService } from '../../shared/shared-variable.service';
+import { sessionEnum } from '../../class/sessionEnum';
 
 @Component({
   selector: 'app-campaign-select',
@@ -10,18 +13,41 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 })
 export class CampaignSelectComponent implements OnInit, OnDestroy {
 
-  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService) { }
+  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService) { }
 
-  public x = [0, 0, 0, 0, 0];
+  public accounts: postlogin[] = [];
+  public currentAccount: postlogin[]=[];
+  public sessions: sessionEnum[] = [];
   modalRef: BsModalRef;
   ngOnInit() {
-  }
+    this.accounts = this.shared.getAccounts();
+    this.stronzo();
 
+  }
+  public stronzo() {
+    for (let account of this.accounts) {
+      let session: sessionEnum = new sessionEnum(account.session_id, account.session_master, account.session_name);
+      this.sessions.push(session);
+    }
+    console.log(this.sessions);
+    for(let i=0;i<this.sessions.length-1;i++){
+      if(this.sessions[i].session_id==this.sessions[i+1].session_id){
+        this.sessions.splice(i,1);
+        i=i-1;
+      }
+    }
+  }
   onSelectCharacter() {
     this.router.navigate(['/dashboard']);
   }
 
-  openModal(template: TemplateRef<any>) {
+  openModal(template: TemplateRef<any>,session_id:number) {
+    this.currentAccount=[];
+    for(let account of this.accounts){
+      if(account.session_id==session_id){
+        this.currentAccount.push(account);
+      }
+    }
     this.modalRef = this.modalService.show(template);
   }
 

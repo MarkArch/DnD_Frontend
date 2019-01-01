@@ -4,7 +4,7 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { FormsModule } from '@angular/forms';
-
+import { HttpClientModule } from '@angular/common/http';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
@@ -42,6 +42,9 @@ import { AppRoutingModule } from './app.routing';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CampaignSelectComponent } from './views/campaign-select/campaign-select.component';
+import { RestServiceService } from './shared/rest-service.service';
+import { postlogin } from './class/postlogin';
+import { SharedVariableService } from './shared/shared-variable.service';
 
 @NgModule({
   imports: [
@@ -57,6 +60,7 @@ import { CampaignSelectComponent } from './views/campaign-select/campaign-select
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
+    HttpClientModule
   ],
   declarations: [
     AppComponent,
@@ -65,12 +69,12 @@ import { CampaignSelectComponent } from './views/campaign-select/campaign-select
     P500Component,
     LoginComponent,
     RegisterComponent,
-    CampaignSelectComponent,
+    CampaignSelectComponent
   ],
   providers: [{
     provide: LocationStrategy,
     useClass: HashLocationStrategy
-  }],
+  },RestServiceService,SharedVariableService],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }
