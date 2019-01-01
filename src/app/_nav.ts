@@ -14,5 +14,15 @@ export const navItems = [
     name: 'Grid',
     url: '/grid',
     icon: 'fas fa-th',
+  },
+  {
+    name: 'Diary',
+    url: '/diary',
+    icon: 'fas fa-book-open',
+  },
+  {
+    name: 'Char Sheet',
+    url: '/sheet',
+    icon: 'fas fa-newspaper',
   }
 ];

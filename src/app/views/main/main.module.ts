@@ -7,6 +7,8 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { HomeComponent } from './home/home.component';
 import { MainRoutingModule } from './main-routing.module';
 import { GridComponent } from './grid/grid.component';
+import { SheetComponent } from './sheet/sheet.component';
+import { DiaryComponent } from './diary/diary.component';
 
 @NgModule({
   imports: [
@@ -18,6 +20,6 @@ import { GridComponent } from './grid/grid.component';
   ],
   declarations: [ 
     HomeComponent, 
-    GridComponent ]
+    GridComponent, SheetComponent, DiaryComponent ]
 })
 export class MainModule { }
