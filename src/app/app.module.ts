@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -60,7 +61,8 @@ import { SharedVariableService } from './shared/shared-variable.service';
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
-    HttpClientModule
+    HttpClientModule,
+    CKEditorModule
   ],
   declarations: [
     AppComponent,
