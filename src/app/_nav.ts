@@ -11,17 +11,17 @@ export const navItems = [
     icon: 'fas fa-dice-d20',
   },
   {
-    name: 'Grid',
+    name: 'Combat Grid',
     url: '/grid',
     icon: 'fas fa-th',
   },
   {
-    name: 'Diary',
+    name: 'Adventure Diary',
     url: '/diary',
     icon: 'fas fa-book-open',
   },
   {
-    name: 'Char Sheet',
+    name: 'Character Sheet',
     url: '/sheet',
     icon: 'fas fa-newspaper',
   }
