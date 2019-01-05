@@ -4,6 +4,7 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 
 import { HomeComponent } from './home/home.component';
 import { MainRoutingModule } from './main-routing.module';
@@ -18,7 +19,8 @@ import { DiaryComponent } from './diary/diary.component';
     CommonModule,
     TabsModule.forRoot(),
     TooltipModule.forRoot(),
-    CKEditorModule
+    CKEditorModule,
+    PdfViewerModule
   ],
   declarations: [ 
     HomeComponent, 
