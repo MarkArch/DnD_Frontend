@@ -1,6 +1,12 @@
 import { Component, OnInit, ViewChild, ElementRef, HostBinding } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { AnimationBuilder, AnimationPlayer } from '@angular/animations';
+import { SharedVariableService } from '../../../shared/shared-variable.service';
+import { character } from '../../../class/character';
+import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
+import { RestServiceService } from '../../../shared/rest-service.service';
+import { grid } from '../../../class/grid';
 // import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
@@ -42,8 +48,25 @@ import { AnimationBuilder, AnimationPlayer } from '@angular/animations';
 
 export class GridComponent implements OnInit {
 
-  constructor() { }
-
+  constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService) {
+    if (this.shared.character == null) {
+      this.router.navigate(['/login']);
+    }
+    this.service.getPositions().subscribe((res: grid[]) => {
+    this.grid = res; console.log(this.grid); for (let position of this.grid) {
+      if (position.charName == this.character.charName) {
+        console.log("setto il personaggio attuale")
+        this.charecterPosition.charName = position.charName;
+        this.charecterPosition.x = position.x;
+        this.charecterPosition.y = position.y;
+      }
+    }
+    });
+  }
+  character: character;
+  grid: grid[] = [];
+  possibleMoves:grid[]=[];
+  charecterPosition: grid=new grid();
   public gridSettingVisible = false;
   public tooltip = 'Current HP 37%';
   public gridDimension = 3;
@@ -62,22 +85,74 @@ export class GridComponent implements OnInit {
   public stats: { name: string, value: number, modifier: number, tempValue: number, totValue: number }[] = [];
 
   ngOnInit() {
+    this.character = this.shared.character;
+    console.log(this.character);
     this.statInitializer();
+
+  }
+  searchCharacterOnGrid(x, y): String {
+    let i: number = 0;
+    let a = "";
+    this.grid.forEach(char => {
+      if (char.x == x && char.y == y) {
+        a = i.toString();
+      }
+      i = i + 1;
+    });
+    this.possibleMoves.forEach(char => {
+      if (char.x == x && char.y == y) {
+        a = "P";
+      }
+    });
+    return a;
   }
 
   statInitializer() {
-    for (let i = 0; i < 5; i++) {
-      let temp = Math.floor(Math.random() * 20) + 4;
-      let temp2 = Math.floor(Math.random() * 5);
-      this.stats.push({
-        name: this.charStats[i],
-        value: temp,
-        modifier: Math.floor((temp - 10) / 2),
-        tempValue: temp2,
-        totValue: Math.floor((temp + temp2 - 10) / 2)
-      });
-    }
+    this.stats.push({
+      name: "Str",
+      value: this.character.strenght,
+      modifier: Math.floor((this.character.strenght - 10) / 2),
+      tempValue: this.character.temporary_strenght,
+      totValue: Math.floor((this.character.strenght + this.character.temporary_strenght - 10) / 2)
+    });
+    this.stats.push({
+      name: "Con",
+      value: this.character.constitution,
+      modifier: Math.floor((this.character.constitution - 10) / 2),
+      tempValue: this.character.temporary_constitution,
+      totValue: Math.floor((this.character.constitution + this.character.temporary_constitution - 10) / 2)
+    });
+    this.stats.push({
+      name: "Dex",
+      value: this.character.dexterity,
+      modifier: Math.floor((this.character.dexterity - 10) / 2),
+      tempValue: this.character.temporary_dexterity,
+      totValue: Math.floor((this.character.dexterity + this.character.temporary_dexterity - 10) / 2)
+    });
+    this.stats.push({
+      name: "Int",
+      value: this.character.intelligence,
+      modifier: Math.floor((this.character.intelligence - 10) / 2),
+      tempValue: this.character.temporary_intelligence,
+      totValue: Math.floor((this.character.intelligence + this.character.temporary_intelligence - 10) / 2)
+    });
+    this.stats.push({
+      name: "Wea",
+      value: this.character.weasdom,
+      modifier: Math.floor((this.character.weasdom - 10) / 2),
+      tempValue: this.character.temporary_weasdom,
+      totValue: Math.floor((this.character.weasdom + this.character.temporary_weasdom - 10) / 2)
+    });
+    this.stats.push({
+      name: "Cha",
+      value: this.character.charisma,
+      modifier: Math.floor((this.character.charisma - 10) / 2),
+      tempValue: this.character.temporary_charisma,
+      totValue: Math.floor((this.character.charisma + this.character.temporary_charisma - 10) / 2)
+    });
   }
+
+
 
   onTempModify(i) {
     this.stats[i].totValue = Math.floor((this.stats[i].value + this.stats[i].tempValue - 10) / 2);
@@ -185,6 +260,11 @@ export class GridComponent implements OnInit {
   onShowGridSettings() {
     this.gridSettingVisible = !this.gridSettingVisible;
   }
-  
+  onGridClick(x, y) {
+    if (this.charecterPosition.x == x && this.charecterPosition.y == y) {
+      console.log("ho premuto sul mio personaggio");
+      this.service.getPossibleMoves(this.character.speed.toString()).subscribe((res:grid[])=>{this.possibleMoves=res});
+    }
+  }
 
 }

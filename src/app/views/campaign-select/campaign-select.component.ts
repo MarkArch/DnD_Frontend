@@ -5,6 +5,8 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { postlogin } from '../../class/postlogin';
 import { SharedVariableService } from '../../shared/shared-variable.service';
 import { sessionEnum } from '../../class/sessionEnum';
+import { RestServiceService } from '../../shared/rest-service.service';
+import { character } from '../../class/character';
 
 @Component({
   selector: 'app-campaign-select',
@@ -13,7 +15,7 @@ import { sessionEnum } from '../../class/sessionEnum';
 })
 export class CampaignSelectComponent implements OnInit, OnDestroy {
 
-  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService) { }
+  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService,private service:RestServiceService) { }
 
   public accounts: postlogin[] = [];
   public currentAccount: postlogin[] = [];
@@ -37,8 +39,12 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
       }
     }
   }
-  onSelectCharacter() {
+  onSelectCharacter(charName:String,session_id:number) {
+    console.log(charName);
+    console.log(session_id);
+    this.service.chooseCharacter(charName,session_id).subscribe((res)=>{this.shared.character=res;
     this.router.navigate(['/dashboard']);
+    });
   }
 
   openModal(template: TemplateRef<any>, session_id: number) {
@@ -49,6 +55,12 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
       }
     }
     this.modalRef = this.modalService.show(template);
+  }
+  onNewSession(){
+    console.log("New session dialog");
+  }
+  onNewCharacter(){
+    console.log("New character sheet")
   }
 
   ngOnDestroy() {

@@ -18,18 +18,8 @@ export class LoginComponent {
   onLogin(username, password) {
     //this.router.navigate(['/campaign']);
     this.service.login(username, password).subscribe(res => {
-      let i = 0;
-      while (res[i] != null) {
-        let account: postlogin=new postlogin();
-        account.alive = res[i].alive;
-        account.charName = res[i].charName;
-        account.session_id = res[i].session_id;
-        account.session_master = res[i].session_master;
-        account.session_name = res[i].session_name;
-        this.accounts.push(account);
-        i = i + 1;
-      }
-      console.log(this.accounts);this.shared.setAccounts(this.accounts); this.router.navigate(['/campaign']);
+      console.log(this.accounts);this.shared.setAccounts(this.accounts); 
+      this.router.navigate(['/campaign']);
     }, err => {
       console.log(err)
     });
