@@ -16,24 +16,24 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
   constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService) { }
 
   public accounts: postlogin[] = [];
-  public currentAccount: postlogin[]=[];
+  public currentAccount: postlogin[] = [];
   public sessions: sessionEnum[] = [];
   modalRef: BsModalRef;
   ngOnInit() {
     this.accounts = this.shared.getAccounts();
-    this.stronzo();
+    this.onSessionsInitializer();
 
   }
-  public stronzo() {
+  onSessionsInitializer() {
     for (let account of this.accounts) {
       let session: sessionEnum = new sessionEnum(account.session_id, account.session_master, account.session_name);
       this.sessions.push(session);
     }
     console.log(this.sessions);
-    for(let i=0;i<this.sessions.length-1;i++){
-      if(this.sessions[i].session_id==this.sessions[i+1].session_id){
-        this.sessions.splice(i,1);
-        i=i-1;
+    for (let i = 0; i < this.sessions.length - 1; i++) {
+      if (this.sessions[i].session_id == this.sessions[i + 1].session_id) {
+        this.sessions.splice(i, 1);
+        i = i - 1;
       }
     }
   }
@@ -41,10 +41,10 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard']);
   }
 
-  openModal(template: TemplateRef<any>,session_id:number) {
-    this.currentAccount=[];
-    for(let account of this.accounts){
-      if(account.session_id==session_id){
+  openModal(template: TemplateRef<any>, session_id: number) {
+    this.currentAccount = [];
+    for (let account of this.accounts) {
+      if (account.session_id == session_id) {
         this.currentAccount.push(account);
       }
     }
@@ -52,7 +52,7 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.modalRef.hide();
+  //  this.modalRef.hide();
   }
 
 }
