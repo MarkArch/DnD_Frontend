@@ -18,8 +18,8 @@
       </div>
       <table class="border separate">
         <tr [@gridAnimation]="gridDimension" class="grid border" *ngFor="let row of yAxis; let y = index">
-          <td [@gridAnimation]="gridDimension" class="grid border" *ngFor="let col of xAxis; let x = index">
-            
+          <td [@gridAnimation]="gridDimension" class="grid border" *ngFor="let col of xAxis; let x = index" (click)="onGridClick(x,y)">
+            {{searchCharacterOnGrid(x,y)}}
           </td>
         </tr>
       </table>
@@ -43,6 +43,7 @@
                   </tr>
                 </thead>
                 <tbody>
+                  
                   <tr *ngFor="let val of stats; let i = index">
                     <td class="text-center left-radius">{{val.name}}</td>
                     <td class="text-center">{{val.value}}</td>
@@ -52,14 +53,15 @@
                     <td class="text-center">{{val.totValue > 0 ? "+" : ""}}{{val.totValue}}</td>
                     <td class="text-center right-radius"><i class="far fa-star"></i></td>
                   </tr>
+                                   
                 </tbody>
               </table>
             </div>
             <div class="col-5 text-center highFont">
               <p class="pt-3 font-weight-bold mb-2">Current HP</p>
-              <p><input class="HPdim" type="number" value="18" style="direction: rtl"> / 30</p>
+              <p><input class="HPdim" type="number" value={{character.current_hp}} style="direction: rtl"> / {{character.hp}}</p>
               <p class="pt-2 font-weight-bold mb-2">Current MP</p>
-              <p>XXX / XXX</p>
+              <p>{{character.current_mana}} / {{character.mana}}</p>
             </div>
           </div>
           <div class="text-center">

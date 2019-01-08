@@ -5,6 +5,8 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { postlogin } from '../../class/postlogin';
 import { SharedVariableService } from '../../shared/shared-variable.service';
 import { sessionEnum } from '../../class/sessionEnum';
+import { RestServiceService } from '../../shared/rest-service.service';
+import { character } from '../../class/character';
 
 @Component({
   selector: 'app-campaign-select',
@@ -13,15 +15,26 @@ import { sessionEnum } from '../../class/sessionEnum';
 })
 export class CampaignSelectComponent implements OnInit, OnDestroy {
 
-  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService) { }
+  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService,private service:RestServiceService) { }
 
   public accounts: postlogin[] = [];
   public currentAccount: postlogin[]=[];
   public sessions: sessionEnum[] = [];
   modalRef: BsModalRef;
   ngOnInit() {
-    this.accounts = this.shared.getAccounts();
-    this.stronzo();
+    this.service.accounts().subscribe(res=>{let i = 0;
+      while (res[i] != null) {
+        let account: postlogin=new postlogin();
+        account.alive = res[i].alive;
+        account.charName = res[i].charName;
+        account.session_id = res[i].session_id;
+        account.session_master = res[i].session_master;
+        account.session_name = res[i].session_name;
+        this.accounts.push(account);
+        i = i + 1;
+      };
+      this.stronzo();},err=>{this.router.navigate(['/login']);alert("You have to login first")});
+    
 
   }
   public stronzo() {
@@ -37,8 +50,12 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
       }
     }
   }
-  onSelectCharacter() {
+  onSelectCharacter(charName:String,session_id:number) {
+    console.log(charName);
+    console.log(session_id);
+    this.service.chooseCharacter(charName,session_id).subscribe((res)=>{this.shared.character=res;
     this.router.navigate(['/dashboard']);
+    });
   }
 
   openModal(template: TemplateRef<any>,session_id:number) {
@@ -50,9 +67,15 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
     }
     this.modalRef = this.modalService.show(template);
   }
+  onNewSession(){
+    console.log("New session dialog");
+  }
+  onNewCharacter(){
+    console.log("New character sheet")
+  }
 
   ngOnDestroy() {
-    this.modalRef.hide();
+    //this.modalRef.hide();
   }
 
 }

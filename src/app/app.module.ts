@@ -46,6 +46,7 @@ import { CampaignSelectComponent } from './views/campaign-select/campaign-select
 import { RestServiceService } from './shared/rest-service.service';
 import { postlogin } from './class/postlogin';
 import { SharedVariableService } from './shared/shared-variable.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
   imports: [
@@ -76,7 +77,7 @@ import { SharedVariableService } from './shared/shared-variable.service';
   providers: [{
     provide: LocationStrategy,
     useClass: HashLocationStrategy
-  },RestServiceService,SharedVariableService],
+  },RestServiceService,SharedVariableService,CookieService],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

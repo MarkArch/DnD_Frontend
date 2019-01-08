@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { postlogin } from '../class/postlogin';
+import { character } from '../class/character';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SharedVariableService {
   private accounts: postlogin[] = [];
+  character:character;
   constructor() { }
 
   public setAccounts(accounts: postlogin[]) {
