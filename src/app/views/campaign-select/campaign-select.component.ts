@@ -15,16 +15,12 @@ import { character } from '../../class/character';
 })
 export class CampaignSelectComponent implements OnInit, OnDestroy {
 
-<<<<<<< HEAD
-  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService, private service: RestServiceService) { }
-=======
-  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService, private service: RestServiceService) { 
+  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService, private service: RestServiceService) {
     this.service.accounts().subscribe((res: postlogin[]) => {
-      this.accounts = res; console.log(res); 
-      this.onSessionsInitializer(); 
-     },err=>this.router.navigate(['/login']));
+      this.accounts = res; console.log(res);
+      this.onSessionsInitializer();
+    }, err => this.router.navigate(['/login']));
   }
->>>>>>> 2785d4e69fb75a1e42b732b91a5d9cbdee64ed09
 
   public headTitle = ' D&D WebApp';
   public accounts: postlogin[] = [];
@@ -72,13 +68,9 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-<<<<<<< HEAD
     if (this.modalRef) {
       this.modalRef.hide();
     }
-=======
-    //  this.modalRef.hide();
->>>>>>> 2785d4e69fb75a1e42b732b91a5d9cbdee64ed09
   }
 
 }
