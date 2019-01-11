@@ -18,8 +18,8 @@
       </div>
       <table class="border separate">
         <tr [@gridAnimation]="gridDimension" class="grid border" *ngFor="let row of yAxis; let y = index">
-          <td [@gridAnimation]="gridDimension" class="grid border" *ngFor="let col of xAxis; let x = index" (click)="onGridClick(x,y)">
-            {{searchCharacterOnGrid(x,y)}}
+          <td [@gridAnimation]="gridDimension" #cell class="grid border" *ngFor="let col of xAxis; let x = index" (click)="onGridClick(x,y,cell)" [ngStyle]="{'background-color': searchCharacterOnGrid(x,y)=='P'?'silver':'white'}">
+            {{searchCharacterOnGrid(x,y)=='P'?'':searchCharacterOnGrid(x,y)}}
           </td>
         </tr>
       </table>
@@ -28,7 +28,7 @@
       <tabset>
         <tab>
           <ng-template tabHeading><i></i>Overview</ng-template>
-          <h4 class="text-center">Nome_PG</h4>
+          <h4 class="text-center">{{character.charName}}</h4>
           <div class=" row">
             <div class="col-7">
               <table class="mb-3 table-striped">
@@ -45,13 +45,13 @@
                 <tbody>
                   
                   <tr *ngFor="let val of stats; let i = index">
-                    <td class="text-center left-radius">{{val.name}}</td>
+                    <td class="text-center left-radius">{{val.name.substring(0,3)}}</td>
                     <td class="text-center">{{val.value}}</td>
                     <td class="text-center">{{val.modifier > 0 ? "+" : ""}}{{val.modifier}}</td>
                     <td class="text-center"><input class="dim" type="number" name="temp" [(ngModel)]="val.tempValue"
                         value="{{val.tempValue}}" (change)="onTempModify(i)"></td>
                     <td class="text-center">{{val.totValue > 0 ? "+" : ""}}{{val.totValue}}</td>
-                    <td class="text-center right-radius"><i class="far fa-star"></i></td>
+                    <td class="text-center right-radius"><i *ngIf="val.savingThrow==1" class="fas fa-star" style="color:  gold"></i><i *ngIf="val.savingThrow==0" class="far fa-star"></i></td>
                   </tr>
                                    
                 </tbody>
@@ -59,14 +59,14 @@
             </div>
             <div class="col-5 text-center highFont">
               <p class="pt-3 font-weight-bold mb-2">Current HP</p>
-              <p><input class="HPdim" type="number" value={{character.current_hp}} style="direction: rtl"> / {{character.hp}}</p>
+              <p><input class="HPdim" type="number" [(ngModel)]="character.current_hp" style="direction: rtl" (change)="onChangeAttribute('current_hp',character.current_hp)"> / {{character.hp}}</p>
               <p class="pt-2 font-weight-bold mb-2">Current MP</p>
-              <p>{{character.current_mana}} / {{character.mana}}</p>
+              <p><input class="HPdim" type="number" [(ngModel)]="character.current_mana" style="direction: rtl" (change)="onChangeAttribute('current_mana',character.current_mana)"> / {{character.mana}}</p>
             </div>
           </div>
           <div class="text-center">
-            <span class="font-weight-bold">Profiency bonus: </span> <span> +4</span>
-            <span class="ml-5 font-weight-bold">AC: </span> <span> 19</span>
+            <span class="font-weight-bold">Profiency bonus: </span> <span>{{character.proficiencyBonus}}</span>
+            <span class="ml-5 font-weight-bold">AC: </span> <span> {{character.armorClass}}</span>
           </div>
           <table class="mt-3 maxWidth">
             <thead>
@@ -90,11 +90,11 @@
           <div class="text-center">
             <h4>Characters</h4>
             <table class=" m-2 p1 maxWidth">
-              <tr *ngFor="let row of stats">
-                <td class="pr-2 pl-2 pb-1 text-center"><i class="fas fa-caret-right"></i></td>
-                <td class="pr-2 pl-2 pb-1 text-center highFont"><span [tooltip]="tooltip" triggers="click">Ignazio</span></td>
-                <td class="pr-2 pl-2 pb-1 text-center highFont">22</td>
-                <td class="pr-2 pl-2 pb-1 text-center highFont">(Des: 13)</td>
+              <tr *ngFor="let pg of sessionPlayers ; let ind=index">
+                <td class="pr-2 pl-2 pb-1 text-center"><i *ngIf="ind==turn" class="fas fa-caret-right"></i></td>
+                <td class="pr-2 pl-2 pb-1 text-center highFont"><span [tooltip]="tooltip[ind]" triggers="click">{{pg.charName}}</span></td>
+                <td class="pr-2 pl-2 pb-1 text-center highFont">{{pg.initiative}}</td>
+                <td class="pr-2 pl-2 pb-1 text-center highFont">(Des: {{pg.dexterity}})</td>
                 <td class="pr-2 pl-2 pb-1 text-center"><button class="btn btn-block btn-sm btn-outline-primary" type="button"><i
                       class="fas fa-pen"></i></button></td>
                 <td class="pr-2 pl-2 pb-2 text-center"><button class="btn btn-block btn-sm btn-outline-danger" type="button"><i
@@ -103,7 +103,7 @@
             </table>
             <div class="row pb-4">
               <div class="col-md-6 col-lg-6">
-                <button class="btn btn-block btn-ghost-submit active" type="button">Next turn</button>
+                <button class="btn btn-block btn-ghost-submit active" type="button" (click)="onNextTurn()">Next turn</button>
               </div>
               <div class="col-md-6 col-lg-6">
                 <button class="btn btn-block btn-ghost-warning active" type="button">Go back</button>

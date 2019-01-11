@@ -50,25 +50,43 @@ export class GridComponent implements OnInit {
 
   constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService) {
     if (this.shared.character == null) {
-      this.router.navigate(['/login']);
+      this.service.chooseCharacter("", 0).subscribe(res => {
+        this.character = res; this.service.getPositions().subscribe((res: grid[]) => {
+          this.grid = res;for (let position of this.grid) {
+            if (position.charName == this.character.charName) {
+              this.charecterPosition.charName = position.charName;
+              this.charecterPosition.x = position.x;
+              this.charecterPosition.y = position.y;
+            }
+          }
+          this.syncroPositions();
+        });
+        this.statInitializer();
+        this.service.getTurn().subscribe(res => { this.sessionPlayers = res;this.sessionPlayers.forEach(p => { this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%") }) });
+      }, err => this.router.navigate(['/campaign']));
+    }else{
+      this.character = this.shared.character; this.service.getPositions().subscribe((res: grid[]) => {
+        this.grid = res; for (let position of this.grid) {
+          if (position.charName == this.character.charName) {
+            this.charecterPosition.charName = position.charName;
+            this.charecterPosition.x = position.x;
+            this.charecterPosition.y = position.y;
+          }
+        }
+      });
+      this.statInitializer();
+      this.service.getTurn().subscribe(res => { this.sessionPlayers = res; this.sessionPlayers.forEach(p => { this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%") }) });
+    
     }
-    this.service.getPositions().subscribe((res: grid[]) => {
-    this.grid = res; console.log(this.grid); for (let position of this.grid) {
-      if (position.charName == this.character.charName) {
-        console.log("setto il personaggio attuale")
-        this.charecterPosition.charName = position.charName;
-        this.charecterPosition.x = position.x;
-        this.charecterPosition.y = position.y;
-      }
-    }
-    });
   }
+  turn: number = 0;
+  sessionPlayers: any;
   character: character;
   grid: grid[] = [];
-  possibleMoves:grid[]=[];
-  charecterPosition: grid=new grid();
+  possibleMoves: grid[] = [];
+  charecterPosition: grid = new grid();
   public gridSettingVisible = false;
-  public tooltip = 'Current HP 37%';
+  public tooltip: any[] = [];
   public gridDimension = 3;
   public x: number = 15;
   public y: number = 15;
@@ -82,22 +100,43 @@ export class GridComponent implements OnInit {
   { name: 'd4.svg', type: 'd4', number: 1, value: 0 },
   { name: 'dp.svg', type: 'd%', number: 1, value: 0 }];
   private charStats = ['For', 'Des', 'Cos', 'Int', 'Sag', 'Car'];
-  public stats: { name: string, value: number, modifier: number, tempValue: number, totValue: number }[] = [];
+  public stats: { name: string, value: number, modifier: number, tempValue: number, totValue: number, savingThrow:number }[] = [];
+
+
+
 
   ngOnInit() {
-    this.character = this.shared.character;
-    console.log(this.character);
-    this.statInitializer();
+  }
+  onNextTurn() {
+    this.service.nextTurn().subscribe((res: number) => {
+      this.turn = res; while (this.turn >= this.sessionPlayers.length) {
 
+        this.turn = this.turn - this.sessionPlayers.length;
+      }
+    });
+  }
+  syncroPositions(){
+    this.service.syncroPositions().subscribe((res: grid[]) => {this.grid=[];
+      this.grid = res;for (let position of this.grid) {
+        if (position.charName == this.character.charName) {
+          this.charecterPosition.charName = position.charName;
+          this.charecterPosition.x = position.x;
+          this.charecterPosition.y = position.y;
+        }
+      }
+      this.syncroPositions();
+    });
   }
   searchCharacterOnGrid(x, y): String {
-    let i: number = 0;
-    let a = "";
+    let a = "";    
     this.grid.forEach(char => {
       if (char.x == x && char.y == y) {
-        a = i.toString();
+        for(let i in this.sessionPlayers){
+          if(this.sessionPlayers[i].charName==char.charName){
+            a=i;
+          }
+        }
       }
-      i = i + 1;
     });
     this.possibleMoves.forEach(char => {
       if (char.x == x && char.y == y) {
@@ -109,52 +148,61 @@ export class GridComponent implements OnInit {
 
   statInitializer() {
     this.stats.push({
-      name: "Str",
+      name: "Strenght",
       value: this.character.strenght,
       modifier: Math.floor((this.character.strenght - 10) / 2),
       tempValue: this.character.temporary_strenght,
-      totValue: Math.floor((this.character.strenght + this.character.temporary_strenght - 10) / 2)
+      totValue: Math.floor((this.character.strenght + this.character.temporary_strenght - 10) / 2),
+      savingThrow: this.character.savingThrow_strenght
     });
     this.stats.push({
-      name: "Con",
+      name: "Constitution",
       value: this.character.constitution,
       modifier: Math.floor((this.character.constitution - 10) / 2),
       tempValue: this.character.temporary_constitution,
-      totValue: Math.floor((this.character.constitution + this.character.temporary_constitution - 10) / 2)
+      totValue: Math.floor((this.character.constitution + this.character.temporary_constitution - 10) / 2),
+      savingThrow: this.character.savingThrow_constitution
     });
     this.stats.push({
-      name: "Dex",
+      name: "Dexterity",
       value: this.character.dexterity,
       modifier: Math.floor((this.character.dexterity - 10) / 2),
       tempValue: this.character.temporary_dexterity,
-      totValue: Math.floor((this.character.dexterity + this.character.temporary_dexterity - 10) / 2)
+      totValue: Math.floor((this.character.dexterity + this.character.temporary_dexterity - 10) / 2),
+      savingThrow: this.character.savingThrow_dexterity
     });
     this.stats.push({
-      name: "Int",
+      name: "Intelligence",
       value: this.character.intelligence,
       modifier: Math.floor((this.character.intelligence - 10) / 2),
       tempValue: this.character.temporary_intelligence,
-      totValue: Math.floor((this.character.intelligence + this.character.temporary_intelligence - 10) / 2)
+      totValue: Math.floor((this.character.intelligence + this.character.temporary_intelligence - 10) / 2),
+      savingThrow: this.character.savingThrow_intelligence
     });
     this.stats.push({
-      name: "Wea",
+      name: "Weasdom",
       value: this.character.weasdom,
       modifier: Math.floor((this.character.weasdom - 10) / 2),
       tempValue: this.character.temporary_weasdom,
-      totValue: Math.floor((this.character.weasdom + this.character.temporary_weasdom - 10) / 2)
+      totValue: Math.floor((this.character.weasdom + this.character.temporary_weasdom - 10) / 2),
+      savingThrow: this.character.savingThrow_weasdom
     });
     this.stats.push({
-      name: "Cha",
+      name: "Charisma",
       value: this.character.charisma,
       modifier: Math.floor((this.character.charisma - 10) / 2),
       tempValue: this.character.temporary_charisma,
-      totValue: Math.floor((this.character.charisma + this.character.temporary_charisma - 10) / 2)
+      totValue: Math.floor((this.character.charisma + this.character.temporary_charisma - 10) / 2),
+      savingThrow: this.character.savingThrow_charisma
     });
   }
 
-
+  onChangeAttribute(char: String,value:String){
+    this.service.updatePg(char,value).subscribe();
+  }
 
   onTempModify(i) {
+    this.service.updatePg("temporary_"+this.stats[i].name.toLowerCase(),this.stats[i].tempValue.toString()).subscribe();
     this.stats[i].totValue = Math.floor((this.stats[i].value + this.stats[i].tempValue - 10) / 2);
   }
 
@@ -260,10 +308,12 @@ export class GridComponent implements OnInit {
   onShowGridSettings() {
     this.gridSettingVisible = !this.gridSettingVisible;
   }
-  onGridClick(x, y) {
+  onGridClick(x, y,cell) {
     if (this.charecterPosition.x == x && this.charecterPosition.y == y) {
-      console.log("ho premuto sul mio personaggio");
-      this.service.getPossibleMoves(this.character.speed.toString()).subscribe((res:grid[])=>{this.possibleMoves=res});
+      this.service.getPossibleMoves(this.character.speed.toString()).subscribe((res: grid[]) => { this.possibleMoves = res });
+    }else if((this.charecterPosition.x != x || this.charecterPosition.y != y) && cell.style.backgroundColor=='silver'){
+      this.service.movePg(x,y).subscribe();
+      this.possibleMoves=[];
     }
   }
 

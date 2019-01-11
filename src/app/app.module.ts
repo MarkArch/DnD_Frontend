@@ -9,7 +9,15 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-
+import {
+  SocialLoginModule,
+  AuthServiceConfig,
+  GoogleLoginProvider,
+  FacebookLoginProvider,
+  LinkedinLoginProvider,
+  VkontakteLoginProvider,
+  AuthService,
+} from "angular-6-social-login-v2";
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
 };
@@ -47,6 +55,24 @@ import { RestServiceService } from './shared/rest-service.service';
 import { postlogin } from './class/postlogin';
 import { SharedVariableService } from './shared/shared-variable.service';
 import { CookieService } from 'ngx-cookie-service';
+import { FacebookModule } from 'ngx-facebook';
+export function getAuthServiceConfigs() {
+  let config = new AuthServiceConfig(
+      [
+        {
+          id: FacebookLoginProvider.PROVIDER_ID,
+          provider: new FacebookLoginProvider("Your-Facebook-app-id")
+        },
+        {
+          id: GoogleLoginProvider.PROVIDER_ID,
+          provider: new GoogleLoginProvider("Your-Google-Client-Id")
+        }     
+  
+      ]
+  );
+  return config;
+}
+
 
 @NgModule({
   imports: [
@@ -63,7 +89,8 @@ import { CookieService } from 'ngx-cookie-service';
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     HttpClientModule,
-    CKEditorModule
+    CKEditorModule,
+    FacebookModule.forRoot()
   ],
   declarations: [
     AppComponent,
@@ -77,7 +104,10 @@ import { CookieService } from 'ngx-cookie-service';
   providers: [{
     provide: LocationStrategy,
     useClass: HashLocationStrategy
-  },RestServiceService,SharedVariableService,CookieService],
+  },RestServiceService,SharedVariableService,CookieService,{
+    provide: AuthServiceConfig,
+    useFactory: getAuthServiceConfigs
+  },AuthService],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }
