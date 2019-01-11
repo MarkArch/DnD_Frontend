@@ -15,16 +15,18 @@ import { character } from '../../class/character';
 })
 export class CampaignSelectComponent implements OnInit, OnDestroy {
 
-  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService,private service:RestServiceService) { }
+  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService, private service: RestServiceService) { 
+    this.service.accounts().subscribe((res: postlogin[]) => {
+      this.accounts = res; console.log(res); 
+      this.onSessionsInitializer(); 
+     },err=>this.router.navigate(['/login']));
+  }
 
   public accounts: postlogin[] = [];
   public currentAccount: postlogin[] = [];
   public sessions: sessionEnum[] = [];
   modalRef: BsModalRef;
   ngOnInit() {
-    this.accounts = this.shared.getAccounts();
-    this.onSessionsInitializer();
-
   }
   onSessionsInitializer() {
     for (let account of this.accounts) {
@@ -39,11 +41,12 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
       }
     }
   }
-  onSelectCharacter(charName:String,session_id:number) {
+  onSelectCharacter(charName: String, session_id: number) {
     console.log(charName);
     console.log(session_id);
-    this.service.chooseCharacter(charName,session_id).subscribe((res)=>{this.shared.character=res;
-    this.router.navigate(['/dashboard']);
+    this.service.chooseCharacter(charName, session_id).subscribe((res) => {
+      this.shared.character = res;
+      this.router.navigate(['/dashboard']);
     });
   }
 
@@ -56,15 +59,15 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
     }
     this.modalRef = this.modalService.show(template);
   }
-  onNewSession(){
+  onNewSession() {
     console.log("New session dialog");
   }
-  onNewCharacter(){
+  onNewCharacter() {
     console.log("New character sheet")
   }
 
   ngOnDestroy() {
-  //  this.modalRef.hide();
+    //  this.modalRef.hide();
   }
 
 }
