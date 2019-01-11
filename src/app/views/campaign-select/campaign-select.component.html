@@ -1,3 +1,27 @@
+<app-header [navbarBrandFull]="{src: 'assets/img/brand/DnDLogo.png', width: 140, height: auto}" [sidebarToggler]="false"
+  [asideMenuToggler]="false">
+  <!-- <div class="pl-5 ml-5"><strong>{{ headTitle }}</strong></div> -->
+  <ul class="nav navbar-nav ml-auto">
+    <li class="nav-item dropdown" dropdown placement="bottom right">
+      <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"
+        dropdownToggle (click)="false">
+        <i class="fa fa-user-circle-o fa-2x"> <span class="caret"> </span></i>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+        <div class="dropdown-header text-center"><strong>Account</strong></div>
+        <!-- <a class="dropdown-item" href="#"><i class="fa fa-bell-o"></i> boh1</a> -->
+
+        <!-- <div class="dropdown-header text-center"><strong>Settings</strong></div> -->
+        <!-- <a class="dropdown-item" href="#"><i class="fa fa-user"></i> boh2</a> -->
+
+        <div class="divider"></div>
+        <a class="dropdown-item" href="#"><i class="fa fa-cog"></i> Settings</a>
+        <a class="dropdown-item" href="/login"><i class="fa fa-lock"></i> Logout</a>
+      </div>
+    </li>
+  </ul>
+</app-header>
+
 <div class="card m-4">
   <div class="card-header text-center">
     <h3>Select your campaign</h3>
@@ -26,10 +50,10 @@
             <img style="width: 100%; height: auto;" src="assets/img/campIcon/alchemy.svg">
           </div>
           <div class="col-8 clickable text-center" (click)="onNewSession()">
-              <h6>Campaign name</h6>
-              <p>New Session</p>
-              <h6>Dungeon Master</h6>
-              <p>TBD</p>
+            <h6>Campaign name</h6>
+            <p>New Session</p>
+            <h6>Dungeon Master</h6>
+            <p>TBD</p>
           </div>
         </div>
       </div>
@@ -46,7 +70,8 @@
   <div class="modal-body">
     <div class="card" *ngFor="let account of currentAccount">
       <div class="card-body row p-2">
-        <div class="col-3 border-right clickable" (click)="onSelectCharacter(account.charName,account.session_id)"><i class="fas fa-dragon"></i></div>
+        <div class="col-3 border-right clickable" (click)="onSelectCharacter(account.charName,account.session_id)"><i
+            class="fas fa-dragon"></i></div>
         <div class="col-3 text-center clickable" (click)="onSelectCharacter(account.charName,account.session_id)">
           <h6>Name: </h6>{{account.charName}}
         </div>
@@ -58,7 +83,7 @@
       </div>
     </div>
     <div class="card">
-    <div class="card-body row p-2">
+      <div class="card-body row p-2">
         <div class="col-3 border-right clickable" (click)="onNewCharacter()"><i class="fas fa-dragon"></i></div>
         <div class="col-8 text-center clickable" (click)="onNewCharacter()">
           Create New Character

@@ -24,7 +24,7 @@ export class DefaultLayoutComponent{
       attributes: true
     });
   }
-  onLogout(){
-    this.service.logout().subscribe(res=>{this.router.navigate(['/login']);})
-  }
+  // onLogout(){
+  //   this.service.logout().subscribe(res=>{this.router.navigate(['/login']);})
+  // }
 }
