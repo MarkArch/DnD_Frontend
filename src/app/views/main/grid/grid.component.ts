@@ -51,7 +51,8 @@ export class GridComponent implements OnInit {
   constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService) {
     if (this.shared.character == null) {
       this.service.chooseCharacter("", 0).subscribe(res => {
-        this.character = res; this.service.getPositions().subscribe((res: grid[]) => {
+        this.shared.character = res; this.character=this.shared.character; 
+        this.service.getPositions().subscribe((res: grid[]) => {
           this.grid = res;for (let position of this.grid) {
             if (position.charName == this.character.charName) {
               this.charecterPosition.charName = position.charName;
@@ -315,6 +316,11 @@ export class GridComponent implements OnInit {
       this.service.movePg(x,y).subscribe();
       this.possibleMoves=[];
     }
+  }
+
+  onResetNote() {
+    let str = "";
+    this.onChangeAttribute ('note', str);
   }
 
 }

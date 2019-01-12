@@ -1,5 +1,12 @@
 <div>
-<ckeditor [editor]="editor" [(ngModel)]="model.editorData"
-[config]></ckeditor>
+    <ckeditor [editor]="editor" [(ngModel)]="model.editorData" [config]></ckeditor>
+</div>
+<div class="row pb-3 pt-3">
+    <div class="col-md-6 col-lg-6">
+        <button class="btn btn-block btn-ghost-success active" type="button" (click)="onChangeAttribute('diary',model.editorData)">Save</button>
+    </div>
+    <div class="col-md-6 col-lg-6">
+        <button class="btn btn-block btn-ghost-danger active" type="button" (click)="onResetDiary()">Reset</button>
+    </div>
 </div>
 <!-- (ready)="onReady($event)" -->

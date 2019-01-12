@@ -73,3 +73,30 @@ font-size: 110%;
     background: #04a0d9;
     cursor: pointer;
   }
+
+  .newLine{
+      width: 60%;
+      padding: 15px;
+    }
+  @media screen and (max-width: 1500px) {
+    .newLine {    
+      width: 100%;
+      padding-top: 15px;
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-bottom: 0;
+    }
+  }
+  .newLine2{
+      width: 40%;
+      padding: 15px;
+    }
+  @media screen and (max-width: 1500px) {
+    .newLine2 {    
+      width: 100%;
+      padding-top: 0;
+      padding-bottom: 15px;
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+  }
