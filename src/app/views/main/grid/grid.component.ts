@@ -48,44 +48,15 @@ import { grid } from '../../../class/grid';
 
 export class GridComponent implements OnInit {
 
-  constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService) {
-    if (this.shared.character == null) {
-      this.service.chooseCharacter("", 0).subscribe(res => {
-        this.shared.character = res; this.character=this.shared.character; 
-        this.service.getPositions().subscribe((res: grid[]) => {
-          this.grid = res;for (let position of this.grid) {
-            if (position.charName == this.character.charName) {
-              this.charecterPosition.charName = position.charName;
-              this.charecterPosition.x = position.x;
-              this.charecterPosition.y = position.y;
-            }
-          }
-          this.syncroPositions();
-        });
-        this.statInitializer();
-        this.service.getTurn().subscribe(res => { this.sessionPlayers = res;this.sessionPlayers.forEach(p => { this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%") }) });
-      }, err => this.router.navigate(['/campaign']));
-    }else{
-      this.character = this.shared.character; this.service.getPositions().subscribe((res: grid[]) => {
-        this.grid = res; for (let position of this.grid) {
-          if (position.charName == this.character.charName) {
-            this.charecterPosition.charName = position.charName;
-            this.charecterPosition.x = position.x;
-            this.charecterPosition.y = position.y;
-          }
-        }
-      });
-      this.statInitializer();
-      this.service.getTurn().subscribe(res => { this.sessionPlayers = res; this.sessionPlayers.forEach(p => { this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%") }) });
-    
-    }
-  }
+  constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService) { }
+
   turn: number = 0;
   sessionPlayers: any;
   character: character;
   grid: grid[] = [];
   possibleMoves: grid[] = [];
   charecterPosition: grid = new grid();
+  public inModify = [];
   public gridSettingVisible = false;
   public tooltip: any[] = [];
   public gridDimension = 3;
@@ -101,24 +72,69 @@ export class GridComponent implements OnInit {
   { name: 'd4.svg', type: 'd4', number: 1, value: 0 },
   { name: 'dp.svg', type: 'd%', number: 1, value: 0 }];
   private charStats = ['For', 'Des', 'Cos', 'Int', 'Sag', 'Car'];
-  public stats: { name: string, value: number, modifier: number, tempValue: number, totValue: number, savingThrow:number }[] = [];
+  public stats: { name: string, value: number, modifier: number, tempValue: number, totValue: number, savingThrow: number }[] = [];
 
 
 
 
   ngOnInit() {
+    if (this.shared.character == null) {
+      this.service.chooseCharacter("", 0).subscribe(res => {
+        this.shared.character = res; this.character = this.shared.character;
+        this.service.getPositions().subscribe((res: grid[]) => {
+          this.grid = res; for (let position of this.grid) {
+            if (position.charName == this.character.charName) {
+              this.charecterPosition.charName = position.charName;
+              this.charecterPosition.x = position.x;
+              this.charecterPosition.y = position.y;
+            }
+          }
+          this.syncroPositions();
+        });
+        this.statInitializer();
+        this.service.getTurn().subscribe(res => {
+          this.sessionPlayers = res;
+          this.sessionPlayers.forEach(p => {
+            this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
+            this.inModify.push(false);
+          })
+        });
+      }, err => this.router.navigate(['/campaign']));
+    } else {
+      this.character = this.shared.character; this.service.getPositions().subscribe((res: grid[]) => {
+        this.grid = res; for (let position of this.grid) {
+          if (position.charName == this.character.charName) {
+            this.charecterPosition.charName = position.charName;
+            this.charecterPosition.x = position.x;
+            this.charecterPosition.y = position.y;
+          }
+        }
+      });
+      this.statInitializer();
+      this.service.getTurn().subscribe(res => {
+        this.sessionPlayers = res;
+        this.sessionPlayers.forEach(p => {
+          this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
+          this.inModify.push(false);
+        })
+      });
+    }
   }
-  onNextTurn() {
-    this.service.nextTurn().subscribe((res: number) => {
-      this.turn = res; while (this.turn >= this.sessionPlayers.length) {
 
-        this.turn = this.turn - this.sessionPlayers.length;
-      }
-    });
+  onNextTurn() {
+    if (this.inModify[this.turn] === false) {
+      this.service.nextTurn().subscribe((res: number) => {
+        this.turn = res; while (this.turn >= this.sessionPlayers.length) {
+
+          this.turn = this.turn - this.sessionPlayers.length;
+        }
+      });
+    }
   }
-  syncroPositions(){
-    this.service.syncroPositions().subscribe((res: grid[]) => {this.grid=[];
-      this.grid = res;for (let position of this.grid) {
+  syncroPositions() {
+    this.service.syncroPositions().subscribe((res: grid[]) => {
+      this.grid = [];
+      this.grid = res; for (let position of this.grid) {
         if (position.charName == this.character.charName) {
           this.charecterPosition.charName = position.charName;
           this.charecterPosition.x = position.x;
@@ -129,12 +145,12 @@ export class GridComponent implements OnInit {
     });
   }
   searchCharacterOnGrid(x, y): String {
-    let a = "";    
+    let a = "";
     this.grid.forEach(char => {
       if (char.x == x && char.y == y) {
-        for(let i in this.sessionPlayers){
-          if(this.sessionPlayers[i].charName==char.charName){
-            a=i;
+        for (let i in this.sessionPlayers) {
+          if (this.sessionPlayers[i].charName == char.charName) {
+            a = i;
           }
         }
       }
@@ -198,12 +214,12 @@ export class GridComponent implements OnInit {
     });
   }
 
-  onChangeAttribute(char: String,value:String){
-    this.service.updatePg(char,value).subscribe();
+  onChangeAttribute(name: String, value: String) {
+    this.service.updatePg(name, value).subscribe();
   }
 
   onTempModify(i) {
-    this.service.updatePg("temporary_"+this.stats[i].name.toLowerCase(),this.stats[i].tempValue.toString()).subscribe();
+    this.service.updatePg("temporary_" + this.stats[i].name.toLowerCase(), this.stats[i].tempValue.toString()).subscribe();
     this.stats[i].totValue = Math.floor((this.stats[i].value + this.stats[i].tempValue - 10) / 2);
   }
 
@@ -309,18 +325,30 @@ export class GridComponent implements OnInit {
   onShowGridSettings() {
     this.gridSettingVisible = !this.gridSettingVisible;
   }
-  onGridClick(x, y,cell) {
+  onGridClick(x, y, cell) {
     if (this.charecterPosition.x == x && this.charecterPosition.y == y) {
       this.service.getPossibleMoves(this.character.speed.toString()).subscribe((res: grid[]) => { this.possibleMoves = res });
-    }else if((this.charecterPosition.x != x || this.charecterPosition.y != y) && cell.style.backgroundColor=='silver'){
-      this.service.movePg(x,y).subscribe();
-      this.possibleMoves=[];
+    } else if ((this.charecterPosition.x != x || this.charecterPosition.y != y) && cell.style.backgroundColor == 'silver') {
+      this.service.movePg(x, y).subscribe();
+      this.possibleMoves = [];
     }
   }
 
   onResetNote() {
     let str = "";
-    this.onChangeAttribute ('note', str);
+    this.onChangeAttribute('note', str);
+  }
+
+  onEditInitiative(i, currChar) {
+    if (this.character.charName === currChar) {
+      this.inModify[i] = true;
+    }
+  }
+
+  onSaveInitiative(i) {
+    this.character.initiative = this.sessionPlayers[i].initiative;
+    this.onChangeAttribute ('initiative', this.character.initiative.toString())
+    this.inModify[i] = false;
   }
 
 }

@@ -13,12 +13,13 @@
         <h5>Set squares number: <input class="HPdim" type="number" [(ngModel)]="x" value="x" (ngModelChange)="onGridInit()">
           X
           <input class="HPdim" type="number" [(ngModel)]="y" value="y" (ngModelChange)="onGridInit()">
-          <span class="float-right">Set squares dimension: 
-          <input type="range" min="1" max="4" value="gridDimension" class="slider" [(ngModel)]="gridDimension" value="gridDimension"></span></h5>
+          <span class="float-right">Set squares dimension:
+            <input type="range" min="1" max="4" value="gridDimension" class="slider" [(ngModel)]="gridDimension" value="gridDimension"></span></h5>
       </div>
       <table class="border separate">
         <tr [@gridAnimation]="gridDimension" class="grid border" *ngFor="let row of yAxis; let y = index">
-          <td [@gridAnimation]="gridDimension" #cell class="grid border" *ngFor="let col of xAxis; let x = index" (click)="onGridClick(x,y,cell)" [ngStyle]="{'background-color': searchCharacterOnGrid(x,y)=='P'?'silver':'white'}">
+          <td [@gridAnimation]="gridDimension" #cell class="grid border" *ngFor="let col of xAxis; let x = index"
+            (click)="onGridClick(x,y,cell)" [ngStyle]="{'background-color': searchCharacterOnGrid(x,y)=='P'?'silver':'white'}">
             {{searchCharacterOnGrid(x,y)=='P'?'':searchCharacterOnGrid(x,y)}}
           </td>
         </tr>
@@ -43,7 +44,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  
+
                   <tr *ngFor="let val of stats; let i = index">
                     <td class="text-center left-radius">{{val.name.substring(0,3)}}</td>
                     <td class="text-center">{{val.value}}</td>
@@ -54,15 +55,17 @@
                     <td class="text-center right-radius"><i *ngIf="val.savingThrow==1" class="fas fa-star" style="color:  gold"></i>
                       <i *ngIf="val.savingThrow==0" class="far fa-star" style="color: rgb(199, 197, 197)"></i></td>
                   </tr>
-                                   
+
                 </tbody>
               </table>
             </div>
             <div class="text-center highFont newLine2">
               <p class="pt-3 font-weight-bold mb-2">Current HP</p>
-              <p><input class="HPdim" type="number" [(ngModel)]="character.current_hp" style="direction: rtl" (change)="onChangeAttribute('current_hp',character.current_hp)"> / {{character.hp}}</p>
+              <p><input class="HPdim" type="number" [(ngModel)]="character.current_hp" style="direction: rtl" (change)="onChangeAttribute('current_hp',character.current_hp)">
+                / {{character.hp}}</p>
               <p class="pt-2 font-weight-bold mb-2">Current MP</p>
-              <p><input class="HPdim" type="number" [(ngModel)]="character.current_mana" style="direction: rtl" (change)="onChangeAttribute('current_mana',character.current_mana)"> / {{character.mana}}</p>
+              <p><input class="HPdim" type="number" [(ngModel)]="character.current_mana" style="direction: rtl"
+                  (change)="onChangeAttribute('current_mana',character.current_mana)"> / {{character.mana}}</p>
             </div>
           </div>
           <div class="text-center">
@@ -94,10 +97,15 @@
               <tr *ngFor="let pg of sessionPlayers ; let ind=index">
                 <td class="pr-2 pl-2 pb-1 text-center"><i *ngIf="ind==turn" class="fas fa-caret-right"></i></td>
                 <td class="pr-2 pl-2 pb-1 text-center highFont"><span [tooltip]="tooltip[ind]" triggers="click">{{pg.charName}}</span></td>
-                <td class="pr-2 pl-2 pb-1 text-center highFont">{{pg.initiative}}</td>
-                <td class="pr-2 pl-2 pb-1 text-center highFont">(Des: {{pg.dexterity}})</td>
-                <td class="pr-2 pl-2 pb-1 text-center"><button class="btn btn-block btn-sm btn-outline-primary" type="button"><i
-                      class="fas fa-pen"></i></button></td>
+                <td [hidden]="inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">{{pg.initiative}}</td>
+                <td [hidden]="!inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">
+                  <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="pg.initiative" value="{{pg.initiative}}"> 
+                </td>
+                <td class="pr-2 pl-2 pb-1 text-center highFont">(Grid: {{pg.alive}})</td>
+                <td class="pr-2 pl-2 pb-1 text-center"><button [hidden]="inModify[ind]" class="btn btn-block btn-sm btn-outline-primary"
+                    type="button" (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
+                  <button [hidden]="!inModify[ind]" class="btn btn-block btn-sm btn-outline-success save-btn" type="button"
+                    (click)="onSaveInitiative(ind)"><i class="fas fa-save save-icon"></i></button></td>
                 <td class="pr-2 pl-2 pb-2 text-center"><button class="btn btn-block btn-sm btn-outline-danger" type="button"><i
                       class="fas fa-trash-alt"></i></button></td>
               </tr>
