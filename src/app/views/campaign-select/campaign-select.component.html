@@ -30,10 +30,10 @@
     <div class="col-4 p-5" *ngFor="let session of sessions">
       <div class="card">
         <div class="card-body row">
-          <div class="col-4 clickable border-right" (click)="openModal(template,session.session_id)">
+          <div class="col-4 clickable border-right" (click)="openModal(template,session.session_id, session.session_master)">
             <img style="width: 100%; height: auto;" src="assets/img/campIcon/alchemy.svg">
           </div>
-          <div class="col-8 clickable text-center" (click)="openModal(template,session.session_id)">
+          <div class="col-8 clickable text-center" (click)="openModal(template,session.session_id, session.session_master)">
             <h6>Campaign name</h6>
             <p>{{session.session_name}}</p>
             <h6>Dungeon Master</h6>
@@ -76,7 +76,7 @@
           <h6>Name: </h6>{{account.charName}}
         </div>
         <div class="col-3 text-center clickable" (click)="onSelectCharacter(account.charName,account.session_id)">
-          <h6>Alive: </h6>{{account.alive}}
+          <h6>Alive: </h6>Flavio no
         </div>
         <!-- <div class="col-3 text-center clickable" (click)="onSelectCharacter()"><h6>Race: </h6> </div>
         <div class="col-3 text-center clickable" (click)="onSelectCharacter()"><h6>LV: </h6> 9</div> -->

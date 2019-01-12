@@ -19,12 +19,13 @@
       <table class="border separate">
         <tr [@gridAnimation]="gridDimension" class="grid border" *ngFor="let row of yAxis; let y = index">
           <td [@gridAnimation]="gridDimension" #cell class="grid border" *ngFor="let col of xAxis; let x = index"
-            (click)="onGridClick(x,y,cell)" [ngStyle]="{'background-color': searchCharacterOnGrid(x,y)=='P'?'silver':'white'}">
-            {{searchCharacterOnGrid(x,y)=='P'?'':searchCharacterOnGrid(x,y)}}
+            (click)="onGridClick(x,y,cell)" [ngStyle]="{'background-color': searchCharacterOnGrid(x,y)=='P'?'silver':'white', color: transparent}">
+            <i class="fas fa-{{searchCharacterOnGrid(x,y)}} fa-2x"></i>
           </td>
         </tr>
       </table>
     </div>
+    <!-- style="width:0px; overflow: hidden;" -->
     <div class="col-md-4 col-lg-4 float-right">
       <tabset>
         <tab>
@@ -99,13 +100,20 @@
                 <td class="pr-2 pl-2 pb-1 text-center highFont"><span [tooltip]="tooltip[ind]" triggers="click">{{pg.charName}}</span></td>
                 <td [hidden]="inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">{{pg.initiative}}</td>
                 <td [hidden]="!inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">
-                  <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="pg.initiative" value="{{pg.initiative}}"> 
+                  <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="pg.initiative" value="{{pg.initiative}}">
                 </td>
-                <td class="pr-2 pl-2 pb-1 text-center highFont">(Grid: {{pg.alive}})</td>
+                <td [hidden]="inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">Grid: {{pg.gridNumber}}</td>
+                <td [hidden]="!inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">
+                  <input class="HPdim" type="text" style="direction: rtl" [(ngModel)]="pg.gridNumber" value="{{pg.gridNumber}}">
+                </td>
                 <td class="pr-2 pl-2 pb-1 text-center"><button [hidden]="inModify[ind]" class="btn btn-block btn-sm btn-outline-primary"
                     type="button" (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
                   <button [hidden]="!inModify[ind]" class="btn btn-block btn-sm btn-outline-success save-btn" type="button"
                     (click)="onSaveInitiative(ind)"><i class="fas fa-save save-icon"></i></button></td>
+                <td class="pr-2 pl-2 pb-2 text-center"><button [hidden]="inGrid[ind]" class="btn btn-block btn-sm btn-outline-primary"
+                    (click)="onArrange(ind, pg.charName)" type="button"><i class="fas fa-th"></i></button>
+                  <button [hidden]="!inGrid[ind]" class="btn btn-block btn-sm btn-outline-success save-btn" type="button"><i
+                      class="fas fa-save save-icon"></i></button></td>
                 <td class="pr-2 pl-2 pb-2 text-center"><button class="btn btn-block btn-sm btn-outline-danger" type="button"><i
                       class="fas fa-trash-alt"></i></button></td>
               </tr>
@@ -118,18 +126,19 @@
                 <button class="btn btn-block btn-ghost-warning active" type="button">Go back</button>
               </div>
             </div>
-            <div class="row">
+            <div [hidden]="!isMasterSession" class="row">
               <div class="col-md-5 col-lg-5 pr-1">
-                <input type="text" class="form-control" placeholder="Add a character">
+                <input type="text" class="form-control" placeholder="Add a character" #newCharName>
               </div>
               <div class="col-md-2 col-lg-2 pl-1 pr-1">
-                <input type="number" class="form-control" placeholder="Init">
+                <input type="number" class="form-control" placeholder="Init" #newInit>
               </div>
               <div class="col-md-2 col-lg-2 pl-1 pr-1">
-                <input type="number" class="form-control" placeholder="Des">
+                <input type="text" class="form-control" placeholder="Grid" #newGridNum>
               </div>
               <div class="col-md-3 col-lg-3">
-                <button class="btn btn-block btn-ghost-success active" type="button">Add</button>
+                <button class="btn btn-block btn-ghost-success active" (click)="onAddNpc(newCharName.value, newInit.value, newGridNum.value)"
+                  type="button">Add</button>
               </div>
             </div>
           </div>

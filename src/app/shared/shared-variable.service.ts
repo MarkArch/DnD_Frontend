@@ -10,6 +10,8 @@ export class SharedVariableService {
   character:character;
   constructor() { }
 
+  public sessionMaster;
+
   public setAccounts(accounts: postlogin[]) {
     this.accounts = accounts;
   }
