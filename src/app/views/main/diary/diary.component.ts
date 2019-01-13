@@ -11,12 +11,17 @@ import { SharedVariableService } from '../../../shared/shared-variable.service';
 })
 export class DiaryComponent implements OnInit {
 
-  constructor(private service: RestServiceService, private shared: SharedVariableService) { }
+  constructor(private service: RestServiceService, private shared: SharedVariableService) {
+    this.service.chooseCharacter('', 0).subscribe( res => {
+      console.log(res);
+      this.model.editorData = res.diary;
+    });
+   }
 
-  public character = this.shared.character.diary;
+  public character;
   public editor = ClassicEditor;
   public model = {
-    editorData: this.character
+    editorData: String
 };
 public config = {
   alignment: {
@@ -30,7 +35,11 @@ public config = {
   }
 
   onChangeAttribute(char: String,value:String){
-    this.service.updatePg(char,value).subscribe();
+    this.service.updatePg(char,value).subscribe( res => {
+      this.service.chooseCharacter('', 0).subscribe( res => {
+        this.model.editorData = res.diary;
+      });
+    });
   }
 
   onResetDiary() {
