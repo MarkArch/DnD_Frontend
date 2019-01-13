@@ -15,7 +15,8 @@ import { character } from '../../class/character';
 })
 export class CampaignSelectComponent implements OnInit, OnDestroy {
 
-  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService, private service: RestServiceService) {
+  constructor(public route: ActivatedRoute, public router: Router, public modalService: BsModalService, private shared: SharedVariableService, 
+    private service: RestServiceService, private shareVariable: SharedVariableService) {
     this.service.accounts().subscribe((res: postlogin[]) => {
       this.accounts = res; console.log(res);
       this.onSessionsInitializer();
@@ -51,8 +52,9 @@ export class CampaignSelectComponent implements OnInit, OnDestroy {
     });
   }
 
-  openModal(template: TemplateRef<any>, session_id: number) {
+  openModal(template: TemplateRef<any>, session_id: number, sessionMaster: string) {
     this.currentAccount = [];
+    this.shareVariable.sessionMaster = sessionMaster;
     for (let account of this.accounts) {
       if (account.session_id == session_id) {
         this.currentAccount.push(account);

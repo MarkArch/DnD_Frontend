@@ -1,7 +1,7 @@
 export class character{
     ref_username:String ="";
     charName:String ="";
-    Session_id:number =0;
+    session_id:number =0;
     note:String ="";
     privilege:String ="";
     gender:String ="";
@@ -44,5 +44,5 @@ export class character{
     mana:number =0;
     current_mana:number =0;
     inspiration:number =0;
-    alive: boolean=false;
+    gridNumber: String="";
 }

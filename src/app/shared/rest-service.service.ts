@@ -20,6 +20,9 @@ export class RestServiceService {
    register(username:string,password:string,email:string):Observable<any>{
     return this.http.post("http://e0fa5ce2.ngrok.io/DeDManager/register", new userlogin(username,password,email));
   }
+   registerNpc(npc: character):Observable<any>{
+    return this.http.post("http://e0fa5ce2.ngrok.io/DeDManager/register/pg", npc, {withCredentials:true});
+  }
   accounts():Observable<any>{
     return this.http.get("http://e0fa5ce2.ngrok.io/DeDManager/Accounts", {withCredentials:true});
   }
@@ -38,11 +41,20 @@ export class RestServiceService {
   facebookLogin(accessToken:String){
     return this.http.post("http://e0fa5ce2.ngrok.io/DeDManager/facebookLogin",accessToken, {withCredentials:true})
   }
+  getCharacterList(){
+    return this.http.get("http://e0fa5ce2.ngrok.io/DeDManager/characterList", {withCredentials:true})
+  }
+  getSyncroCharacterList(){
+    return this.http.get("http://e0fa5ce2.ngrok.io/DeDManager/characterList/syncro", {withCredentials:true})
+  }
+  getSyncroTurn(){
+    return this.http.get("http://e0fa5ce2.ngrok.io/DeDManager/turn/syncro", {withCredentials:true})
+  }
+  getNextTurn(){
+    return this.http.get("http://e0fa5ce2.ngrok.io/DeDManager/turn/next", {withCredentials:true})
+  }
   getTurn(){
     return this.http.get("http://e0fa5ce2.ngrok.io/DeDManager/turn", {withCredentials:true})
-  }
-  nextTurn(){
-    return this.http.get("http://e0fa5ce2.ngrok.io/DeDManager/turn/next", {withCredentials:true})
   }
   updatePg(label:String,value:String){
     return this.http.put("http://e0fa5ce2.ngrok.io/DeDManager/updatePg",label+":"+value, {withCredentials:true})
