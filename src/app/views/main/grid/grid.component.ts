@@ -69,6 +69,7 @@ export class GridComponent implements OnInit {
             this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
             this.inModify.push(false);
             this.inGrid.push(false);
+            this.isFriend.push(false);
           })
           this.service.getTurn().subscribe(res => {
             this.turn = +res;
@@ -98,6 +99,7 @@ export class GridComponent implements OnInit {
           this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
           this.inModify.push(false);
           this.inGrid.push(false);
+          this.isFriend.push(false);
         })
         this.service.getTurn().subscribe(res => {
           this.turn = +res;
@@ -119,6 +121,7 @@ export class GridComponent implements OnInit {
   grid: grid[] = [];
   possibleMoves: grid[] = [];
   charecterPosition: grid = new grid();
+  public isFriend = [];
   public inModify = [];
   public inGrid = [];
   public gridSettingVisible = false;
@@ -176,6 +179,9 @@ export class GridComponent implements OnInit {
         for (let i in this.sessionPlayers) {
           if (this.sessionPlayers[i].charName == char.charName) {
             a = this.sessionPlayers[i].gridNumber;
+            if ( this.sessionPlayers[i].dexterity > 0) {
+              this.isFriend[i]=true;
+            }
           }
         }
       }
@@ -184,6 +190,23 @@ export class GridComponent implements OnInit {
       if (char.x == x && char.y == y) {
         a = "P";
       }
+    });
+    return a;
+  }
+
+  onCheckFriend(x, y): boolean {
+    let a = false;
+    this.grid.forEach(char => {
+      if (char.x == x && char.y == y) {
+        for (let i in this.sessionPlayers) {
+          if (this.sessionPlayers[i].charName == char.charName) {
+            if ( this.sessionPlayers[i].dexterity > 0) {
+              a = true;
+            }
+          }
+        }
+      }
+
     });
     return a;
   }
