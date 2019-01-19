@@ -68,4 +68,10 @@ export class RestServiceService {
   syncroPositions(){
     return this.http.get("http://192.168.1.162:8080/DeDManager/positions/syncro", {withCredentials:true})
   }
+  syncroDice(){
+    return this.http.get("http://192.168.1.162:8080/DeDManager/syncroDice", {withCredentials:true})
+  }
+  throwDice(dice_type:String, dice_value:number){
+    return this.http.post("http://192.168.1.162:8080/DeDManager/ThrowDice/"+dice_type,dice_value.toString(), {withCredentials:true})
+  }
 }
