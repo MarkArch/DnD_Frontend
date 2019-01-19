@@ -64,6 +64,8 @@ export class GridComponent implements OnInit {
         });
         this.statInitializer();
         this.service.getCharacterList().subscribe(res => {
+          console.log("informazioni pg");
+          console.log(res);
           this.sessionPlayers = res;
           this.sessionPlayers.forEach(p => {
             this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
@@ -78,6 +80,7 @@ export class GridComponent implements OnInit {
             }
             this.syncroTurn();
             this.syncroCharacter();
+            this.syncroDice();
           })
         });
       }, err => this.router.navigate(['/campaign']));
@@ -94,6 +97,8 @@ export class GridComponent implements OnInit {
       });
       this.statInitializer();
       this.service.getCharacterList().subscribe(res => {
+        console.log("informazioni pg");
+        console.log(res)
         this.sessionPlayers = res;
         this.sessionPlayers.forEach(p => {
           this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
@@ -108,6 +113,7 @@ export class GridComponent implements OnInit {
           }
           this.syncroTurn();
           this.syncroCharacter();
+          this.syncroDice();
         })
       });
     }
@@ -213,6 +219,7 @@ export class GridComponent implements OnInit {
   syncroCharacter() {
     this.service.getSyncroCharacterList().subscribe(res => {
       console.log('syncroturn' + this.turn);
+      console.log("informazioni pg");
       this.sessionPlayers = res;
       this.tooltip = [];
       this.sessionPlayers.forEach(p => {
@@ -301,6 +308,7 @@ export class GridComponent implements OnInit {
           temp += Math.ceil(Math.random() * 20);
         }
         this.diceArray[i].value = temp;
+        this.service.throwDice("d20", this.diceArray[i].value).subscribe();
         break;
       }
       case 1: {
@@ -308,6 +316,7 @@ export class GridComponent implements OnInit {
           temp += Math.ceil(Math.random() * 12);
         }
         this.diceArray[i].value = temp;
+        this.service.throwDice("d12", this.diceArray[i].value).subscribe();
         break;
       }
       case 2: {
@@ -315,6 +324,7 @@ export class GridComponent implements OnInit {
           temp += Math.ceil(Math.random() * 10);
         }
         this.diceArray[i].value = temp;
+        this.service.throwDice("d10", this.diceArray[i].value).subscribe();
         break;
       }
       case 3: {
@@ -322,6 +332,7 @@ export class GridComponent implements OnInit {
           temp += Math.ceil(Math.random() * 8);
         }
         this.diceArray[i].value = temp;
+        this.service.throwDice("d8", this.diceArray[i].value).subscribe();
         break;
       }
       case 4: {
@@ -329,6 +340,7 @@ export class GridComponent implements OnInit {
           temp += Math.ceil(Math.random() * 6);
         }
         this.diceArray[i].value = temp;
+        this.service.throwDice("d6", this.diceArray[i].value).subscribe();
         break;
       }
       case 5: {
@@ -336,6 +348,7 @@ export class GridComponent implements OnInit {
           temp += Math.ceil(Math.random() * 4);
         }
         this.diceArray[i].value = temp;
+        this.service.throwDice("d4", this.diceArray[i].value).subscribe();
         break;
       }
       case 6: {
@@ -343,6 +356,7 @@ export class GridComponent implements OnInit {
           temp += Math.ceil(Math.random() * 100);
         }
         this.diceArray[i].value = temp;
+        this.service.throwDice("d%", this.diceArray[i].value).subscribe();
         break;
       }
     }
@@ -443,6 +457,9 @@ export class GridComponent implements OnInit {
     npc.initiative = init;
     npc.gridNumber = gridNum;
     this.service.registerNpc(npc).subscribe();
+  }
+  syncroDice() {
+    this.service.syncroDice().subscribe((res:any) => { alert(res.ref_charName + " ha tirato un " + res.dice_type + " facendo un bel " + res.dice_value);this.syncroDice() });
   }
 
   onChangeChar(i) {

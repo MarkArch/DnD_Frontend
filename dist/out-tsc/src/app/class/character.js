@@ -1,0 +1,55 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var character = /** @class */ (function () {
+    function character() {
+        this.ref_username = "";
+        this.charName = "";
+        this.Session_id = 0;
+        this.note = "";
+        this.privilege = "";
+        this.gender = "";
+        this.alignament = "";
+        this.hit_dice = "";
+        this.diary = "";
+        this.class1 = "";
+        this.class2 = "";
+        this.class3 = "";
+        this.class4 = "";
+        this.class5 = "";
+        this.class6 = "";
+        this.level = 0;
+        this.eyes = "";
+        this.hairs = "";
+        this.strenght = 0;
+        this.dexterity = 0;
+        this.constitution = 0;
+        this.intelligence = 0;
+        this.weasdom = 0;
+        this.charisma = 0;
+        this.temporary_strenght = 0;
+        this.temporary_dexterity = 0;
+        this.temporary_constitution = 0;
+        this.temporary_intelligence = 0;
+        this.temporary_weasdom = 0;
+        this.temporary_charisma = 0;
+        this.savingThrow_strenght = 0;
+        this.savingThrow_dexterity = 0;
+        this.savingThrow_constitution = 0;
+        this.savingThrow_intelligence = 0;
+        this.savingThrow_weasdom = 0;
+        this.savingThrow_charisma = 0;
+        this.proficiencyBonus = 0;
+        this.initiative = 0;
+        this.speed = 0;
+        this.armorClass = 0;
+        this.hp = 0;
+        this.current_hp = 0;
+        this.mana = 0;
+        this.current_mana = 0;
+        this.inspiration = 0;
+        this.alive = false;
+    }
+    return character;
+}());
+exports.character = character;
+//# sourceMappingURL=character.js.map
