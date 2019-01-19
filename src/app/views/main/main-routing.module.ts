@@ -5,6 +5,7 @@ import { HomeComponent } from './home/home.component';
 import { GridComponent } from './grid/grid.component';
 import { DiaryComponent } from './diary/diary.component';
 import { SheetComponent } from './sheet/sheet.component';
+import { AuthGuardService } from '../../shared/auth-guard.service';
 
 const routes: Routes = [
   {
@@ -27,6 +28,7 @@ const routes: Routes = [
   },
   {
     path: 'sheet',
+  //  canActivate: [AuthGuardService],
     component: SheetComponent,
   }
 ];

@@ -17,6 +17,12 @@ export class RestServiceService {
     var user:userlogin=new userlogin(username,password,null);
     return this.http.post("http://192.168.1.162:8080/DeDManager/login",user, {withCredentials:true});
   }
+  isLoggedIn(): Observable<any>{
+    return this.http.get("http://192.168.1.162:8080/DeDManager/validateAuthToken", {withCredentials:true});
+  }
+  campaignChosed(): Observable<any>{
+    return this.http.get("http://192.168.1.162:8080/DeDManager/validateCharToken", {withCredentials:true});
+  }
    register(username:string,password:string,email:string):Observable<any>{
     return this.http.post("http://192.168.1.162:8080/DeDManager/register", new userlogin(username,password,email));
   }

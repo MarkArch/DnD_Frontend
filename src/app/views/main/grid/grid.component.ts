@@ -179,8 +179,8 @@ export class GridComponent implements OnInit {
         for (let i in this.sessionPlayers) {
           if (this.sessionPlayers[i].charName == char.charName) {
             a = this.sessionPlayers[i].gridNumber;
-            if ( this.sessionPlayers[i].dexterity > 0) {
-              this.isFriend[i]=true;
+            if (this.sessionPlayers[i].dexterity > 0) {
+              this.isFriend[i] = true;
             }
           }
         }
@@ -200,7 +200,7 @@ export class GridComponent implements OnInit {
       if (char.x == x && char.y == y) {
         for (let i in this.sessionPlayers) {
           if (this.sessionPlayers[i].charName == char.charName) {
-            if ( this.sessionPlayers[i].dexterity > 0) {
+            if (this.sessionPlayers[i].dexterity > 0) {
               a = true;
             }
           }
@@ -445,4 +445,20 @@ export class GridComponent implements OnInit {
     this.service.registerNpc(npc).subscribe();
   }
 
+  onChangeChar(i) {
+    if (this.character.privilege == 'master' && this.sessionPlayers[i].dexterity == 0) {
+      this.service.chooseCharacter(this.sessionPlayers[i].charName, this.sessionPlayers[i].session_id).subscribe(res => {
+        this.character = res;
+        this.service.getPositions().subscribe((res: grid[]) => {
+          this.grid = res; for (let position of this.grid) {
+            if (position.charName == this.character.charName) {
+              this.charecterPosition.charName = position.charName;
+              this.charecterPosition.x = position.x;
+              this.charecterPosition.y = position.y;
+            }
+          }
+        });
+      });
+    }
+  }
 }

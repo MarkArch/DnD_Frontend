@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { RestServiceService } from '../../../shared/rest-service.service';
 
 @Component({
   selector: 'app-sheet',
@@ -7,9 +8,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SheetComponent implements OnInit {
 
-  constructor() { }
+  constructor(public httpServ: RestServiceService) { }
 
   ngOnInit() {
+    this.httpServ.isLoggedIn().subscribe(res => console.log(res));
+    this.httpServ.campaignChosed().subscribe(res => console.log(res));
   }
 
 }
