@@ -303,6 +303,7 @@ export class GridComponent implements OnInit {
 
   onDiceThrow(i) {
     let temp = 0;
+    this.diceArray[i].number = 1;
     switch (i) {
       case 0: {
         for (let k = 0; k < this.diceArray[i].number; k++) {
