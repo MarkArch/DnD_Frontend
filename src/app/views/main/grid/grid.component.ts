@@ -119,6 +119,7 @@ export class GridComponent implements OnInit {
     }
   }
 
+  public diceThrow;
   settingOnGrid = false;
   isMasterSession = false;
   turn: number = 0;
@@ -459,7 +460,10 @@ export class GridComponent implements OnInit {
     this.service.registerNpc(npc).subscribe();
   }
   syncroDice() {
-    this.service.syncroDice().subscribe((res:any) => { alert(res.ref_charName + " ha tirato un " + res.dice_type + " facendo un bel " + res.dice_value);this.syncroDice() });
+    this.service.syncroDice().subscribe((res:any) => { 
+      this.diceThrow = res.ref_charName + " ha tirato un " + res.dice_type + " facendo un bel " + res.dice_value;
+      this.syncroDice() 
+    });
   }
 
   onChangeChar(i) {
