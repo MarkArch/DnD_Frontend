@@ -63,5 +63,10 @@ export class LoginComponent implements OnInit {
   private handleError(error) {
     console.error('Error processing action', error);
   }
+  onKeydown(event,username,password) {
+    if (event.key === "Enter") {
+      this.onLogin(username,password);
+    }
+  }
 
 }

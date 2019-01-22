@@ -18,7 +18,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text"><i class="icon-lock"></i></span>
                   </div>
-                  <input type="password" class="form-control" placeholder="Password" #password>
+                  <input type="password" class="form-control" placeholder="Password" (keydown)="onKeydown($event,userName.value,password.value)" #password>
                 </div>
                 <div class="row">
                   <div class="col-6">

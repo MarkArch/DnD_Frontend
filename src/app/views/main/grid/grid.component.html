@@ -19,7 +19,7 @@
       <table class="border separate">
         <tr [@gridAnimation]="gridDimension" class="grid border" *ngFor="let row of yAxis; let y = index">
           <td [@gridAnimation]="gridDimension" #cell class="grid border" *ngFor="let col of xAxis; let x = index"
-            (click)="onGridClick(x,y,cell)" [ngStyle]="{'background-color': searchCharacterOnGrid(x,y)=='P'?'silver':'white', color: transparent}">
+            (click)="onGridClick(x,y,cell)" [ngStyle]="{'background-color': x==ping.x && y==ping.y?'lightblue':searchCharacterOnGrid(x,y)=='P'?'silver':'white', color: transparent}">
             <i class="fas fa-{{searchCharacterOnGrid(x,y)}} fa-2x" [ngStyle]="{'color': onCheckFriend(x, y) ? 'blue':'red'}"></i>
           </td>
         </tr>

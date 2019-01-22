@@ -80,4 +80,13 @@ export class RestServiceService {
   throwDice(dice_type:String, dice_value:number){
     return this.http.post("http://192.168.1.62:8080/DeDManager/ThrowDice/"+dice_type,dice_value.toString(), {withCredentials:true})
   }
+  pingGrid(x:number,y:number){
+    let g:grid=new grid();
+    g.x=x;
+    g.y=y;
+    return this.http.post("http://192.168.1.62:8080/DeDManager/ping/",g, {withCredentials:true})
+  }
+  syncroPing(){
+    return this.http.get("http://192.168.1.62:8080/DeDManager/ping/syncro", {withCredentials:true})
+  }
 }

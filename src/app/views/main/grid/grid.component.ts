@@ -81,6 +81,7 @@ export class GridComponent implements OnInit {
             this.syncroTurn();
             this.syncroCharacter();
             this.syncroDice();
+            this.syncroPing();
           })
         });
       }, err => this.router.navigate(['/campaign']));
@@ -114,6 +115,7 @@ export class GridComponent implements OnInit {
           this.syncroTurn();
           this.syncroCharacter();
           this.syncroDice();
+          this.syncroPing();
         })
       });
     }
@@ -128,6 +130,7 @@ export class GridComponent implements OnInit {
   grid: grid[] = [];
   possibleMoves: grid[] = [];
   charecterPosition: grid = new grid();
+  ping: grid = { charName: "", x: 99, y: 99 };
   public isFriend = [];
   public inModify = [];
   public inGrid = [];
@@ -424,6 +427,8 @@ export class GridComponent implements OnInit {
       }
       this.settingOnGrid = false;
       this.possibleMoves = [];
+    } else {
+      this.service.pingGrid(x, y).subscribe();
     }
   }
 
@@ -458,12 +463,14 @@ export class GridComponent implements OnInit {
     npc.charName = name;
     npc.initiative = init;
     npc.gridNumber = gridNum;
+    npc.speed=9;
+    npc.privilege='master';
     this.service.registerNpc(npc).subscribe();
   }
   syncroDice() {
-    this.service.syncroDice().subscribe((res:any) => { 
+    this.service.syncroDice().subscribe((res: any) => {
       this.diceThrow = res.ref_charName + " ha tirato un " + res.dice_type + " facendo un bel " + res.dice_value;
-      this.syncroDice() 
+      this.syncroDice()
     });
   }
 
@@ -482,5 +489,32 @@ export class GridComponent implements OnInit {
         });
       });
     }
+  }
+
+  syncroPing() {
+    this.service.syncroPing().subscribe((res: grid) => {
+      let a: grid = new grid();
+      a.x = 99;
+      a.y = 99;
+      this.ping = res;
+      setTimeout(() => {
+        this.ping = a;
+      }, 300);
+      setTimeout(() => {
+        this.ping = res;
+      }, 600);
+      setTimeout(() => {
+        this.ping = a;
+      }, 900);
+      setTimeout(() => {
+        this.ping = res;
+      }, 1200);
+      setTimeout(() => {
+        this.ping = a;
+      }, 1500);
+      this.syncroPing();
+    });
+
+
   }
 }
