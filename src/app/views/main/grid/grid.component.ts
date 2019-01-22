@@ -186,11 +186,15 @@ export class GridComponent implements OnInit {
     let a = "";
     this.grid.forEach(char => {
       if (char.x == x && char.y == y) {
-        for (let i in this.sessionPlayers) {
-          if (this.sessionPlayers[i].charName == char.charName) {
-            a = this.sessionPlayers[i].gridNumber;
-            if (this.sessionPlayers[i].dexterity > 0) {
-              this.isFriend[i] = true;
+        if (char.charName == "tree") {
+          return a="tree";
+          } else {
+          for (let i in this.sessionPlayers) {
+            if (this.sessionPlayers[i].charName == char.charName) {
+              a = this.sessionPlayers[i].gridNumber;
+              if (this.sessionPlayers[i].dexterity > 0) {
+                this.isFriend[i] = true;
+              }
             }
           }
         }
@@ -463,8 +467,8 @@ export class GridComponent implements OnInit {
     npc.charName = name;
     npc.initiative = init;
     npc.gridNumber = gridNum;
-    npc.speed=9;
-    npc.privilege='master';
+    npc.speed = 9;
+    npc.privilege = 'master';
     this.service.registerNpc(npc).subscribe();
   }
   syncroDice() {
