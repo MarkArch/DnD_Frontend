@@ -7,6 +7,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
 import { RestServiceService } from '../../../shared/rest-service.service';
 import { grid } from '../../../class/grid';
+import { buff } from '../../../class/buff';
+import { st } from '@angular/core/src/render3';
 // import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
@@ -73,16 +75,19 @@ export class GridComponent implements OnInit {
             this.inGrid.push(false);
             this.isFriend.push(false);
           })
+          this.service.getBuff().subscribe((res: buff[]) => { this.buffs = res;});
           this.service.getTurn().subscribe(res => {
             this.turn = +res;
             while (this.turn >= this.sessionPlayers.length) {
               this.turn = this.turn - this.sessionPlayers.length;
             }
+
             this.syncroTurn();
             this.syncroCharacter();
             this.syncroDice();
             this.syncroPing();
-          })
+          //  this.syncroBuff();
+          });
         });
       }, err => this.router.navigate(['/campaign']));
     } else {
@@ -107,6 +112,7 @@ export class GridComponent implements OnInit {
           this.inGrid.push(false);
           this.isFriend.push(false);
         })
+        this.service.getBuff().subscribe((res: buff[]) => { this.buffs = res}); 
         this.service.getTurn().subscribe(res => {
           this.turn = +res;
           while (this.turn >= this.sessionPlayers.length) {
@@ -116,6 +122,7 @@ export class GridComponent implements OnInit {
           this.syncroCharacter();
           this.syncroDice();
           this.syncroPing();
+       //   this.syncroBuff();
         })
       });
     }
@@ -131,6 +138,10 @@ export class GridComponent implements OnInit {
   possibleMoves: grid[] = [];
   charecterPosition: grid = new grid();
   ping: grid = { charName: "", x: 99, y: 99 };
+  setObjectOnGrid = false;
+  deleteObjectFromGrid = false;
+  objectName: String = "";
+  buffs: buff[] = [];
   public isFriend = [];
   public inModify = [];
   public inGrid = [];
@@ -166,6 +177,9 @@ export class GridComponent implements OnInit {
         this.turn = res; while (this.turn >= this.sessionPlayers.length) {
           this.turn = this.turn - this.sessionPlayers.length;
         }
+        if(this.sessionPlayers[this.turn].charName==this.character.charName){
+          this.service.getBuffUpdate().subscribe();
+        }
       });
     }
   }
@@ -187,12 +201,16 @@ export class GridComponent implements OnInit {
     this.grid.forEach(char => {
       if (char.x == x && char.y == y) {
         if (char.charName == "tree") {
-          return a="tree";
-          } else {
+          return a = "tree";
+        } else if (char.charName == "horizontal wall") {
+          return a = "grip-lines";
+        } else if (char.charName == "vertical wall") {
+          return a = "grip-lines-vertical"
+        } else {
           for (let i in this.sessionPlayers) {
             if (this.sessionPlayers[i].charName == char.charName) {
               a = this.sessionPlayers[i].gridNumber;
-              if (this.sessionPlayers[i].dexterity > 0) {
+              if (this.sessionPlayers[i].privilege == 'user') {
                 this.isFriend[i] = true;
               }
             }
@@ -212,9 +230,12 @@ export class GridComponent implements OnInit {
     let a = false;
     this.grid.forEach(char => {
       if (char.x == x && char.y == y) {
+        if (char.charName == 'tree' || char.charName == 'horizontal wall' || char.charName == 'vertical wall') {
+          return a = true;
+        }
         for (let i in this.sessionPlayers) {
           if (this.sessionPlayers[i].charName == char.charName) {
-            if (this.sessionPlayers[i].dexterity > 0) {
+            if (this.sessionPlayers[i].privilege == 'user') {
               a = true;
             }
           }
@@ -234,7 +255,7 @@ export class GridComponent implements OnInit {
         this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
         this.inModify.push(false);
       })
-      this.syncroCharacter()
+      this.service.getBuff().subscribe((res:buff[])=>{this.buffs=res,this.syncroCharacter()})
     });
   }
 
@@ -431,6 +452,10 @@ export class GridComponent implements OnInit {
       }
       this.settingOnGrid = false;
       this.possibleMoves = [];
+    } else if (this.setObjectOnGrid == true) {
+      this.service.setObjectOnGrid(this.objectName, x, y).subscribe(res => { this.setObjectOnGrid = false });
+    } else if (this.deleteObjectFromGrid == true) {
+      this.service.deleteObjectOnGrid("", x, y).subscribe(res => { this.deleteObjectFromGrid = false });;
     } else {
       this.service.pingGrid(x, y).subscribe();
     }
@@ -479,7 +504,7 @@ export class GridComponent implements OnInit {
   }
 
   onChangeChar(i) {
-    if (this.character.privilege == 'master' && this.sessionPlayers[i].dexterity == 0) {
+    if (this.character.privilege == 'master' && this.sessionPlayers[i].privilege == 'master') {
       this.service.chooseCharacter(this.sessionPlayers[i].charName, this.sessionPlayers[i].session_id).subscribe(res => {
         this.character = res;
         this.service.getPositions().subscribe((res: grid[]) => {
@@ -518,7 +543,22 @@ export class GridComponent implements OnInit {
       }, 1500);
       this.syncroPing();
     });
-
-
+  }
+  onSetObjectOnGrid(objectName) {
+    this.setObjectOnGrid = true;
+    this.objectName = objectName;
+  }
+  onDeleteObjectFromGrid() {
+    this.deleteObjectFromGrid = true;
+  }
+  onGridEmpty() {
+    this.service.emptyGrid().subscribe();
+  }
+  onObjectGridEmpty() {
+    this.service.emptyObjectGrid().subscribe();
+  }
+  onSetBuff(charNameTo, stat, intensity, lastFor, type) {
+    console.log(charNameTo, stat, intensity, lastFor, type);
+    this.service.postBuff(this.character.charName, charNameTo, stat, intensity, lastFor, type).subscribe();
   }
 }

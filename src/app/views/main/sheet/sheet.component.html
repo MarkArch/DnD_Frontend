@@ -1,13 +1,14 @@
 <div class="card">
+  <div style="float:right"><button (click)="onSave()" style="float: right;">Save</button></div>
     <div class="card-body">
       <div class="row">
         <div class="col-5">
-          <input type="text" value="characterName" [(ngModel)]="characterName" placeholder="Nome personaggio" class="width100">
+          <input type="text" value="{{character.charName}}" [(ngModel)]="character.charName" placeholder="Nome personaggio" class="width100">
         </div>
         <div class="col-7">
           <input type="text" value="characterCL" [(ngModel)]="characterCL" placeholder="Classe & livello" class="width30">
           <input type="text" value="characterBG" [(ngModel)]="characterBG" placeholder="Background" class="width30">
-          <input type="text" value="playerName" [(ngModel)]="playerName" placeholder="Nome giocatore" class="width30">
+          <input type="text" value="{{character.ref_username}}"placeholder="Nome giocatore" class="width30">
           <input type="text" value="characterRace" [(ngModel)]="characterRace" placeholder="Razza" class="width30">
           <input type="text" value="characterAlignment" [(ngModel)]="characterAlignment" placeholder="Allineamento" class="width30">
           <input type="text" value="characterExp" [(ngModel)]="characterExp" placeholder="Punti esperienza" class="width30">
@@ -17,23 +18,23 @@
         <div class="col-4">
           <div class="row">
             <div class="col-4 border text-center">
-              <input type="number" value="strenghtValue" [(ngModel)]="strenghtValue" placeholder="FOR" class="square">
-              <input type="number" value="strenghtModifier" [(ngModel)]="strenghtModifier" class="minisquare">
+              <input type="number" value="{{character.strenght}}" [(ngModel)]="character.strenght" placeholder="FOR" class="square">
+              <input type="number" value="{{strenghtModifier}}" class="minisquare">
               <br>
-              <input type="number" value="dexterityValue" [(ngModel)]="dexterityValue" placeholder="DES" class="square">
-              <input type="number" value="dexterityModifier" [(ngModel)]="dexterityModifier" class="minisquare">
+              <input type="number" value="{{character.dexterity}}" [(ngModel)]="character.dexterity" placeholder="DES" class="square">
+              <input type="number" value="{{dexterityModifier}}" class="minisquare">
               <br>
-              <input type="number" value="constitutionValue" [(ngModel)]="constitutionValue" placeholder="COS" class="square">
-              <input type="number" value="constitutionModifier" [(ngModel)]="constitutionModifier" class="minisquare">
+              <input type="number" value="{{character.constitution}}" [(ngModel)]="character.constitution" placeholder="COS" class="square">
+              <input type="number" value="{{constitutionModifier}}" class="minisquare">
               <br>
-              <input type="number" value="inteligenceValue" [(ngModel)]="inteligenceValue" placeholder="INT" class="square">
-              <input type="number" value="inteligenceModifier" [(ngModel)]="inteligenceModifier" class="minisquare">
+              <input type="number" value="{{character.intelligence}}" [(ngModel)]="character.intelligence" placeholder="INT" class="square">
+              <input type="number" value="{{intelligenceModifier}}" class="minisquare">
               <br>
-              <input type="number" value="wisdomValue" [(ngModel)]="wisdomValue" placeholder="SAG" class="square">
-              <input type="number" value="wisdomModifier" [(ngModel)]="wisdomModifier" class="minisquare">
+              <input type="number" value="{{character.weasdom}}" [(ngModel)]="character.weasdom" placeholder="SAG" class="square">
+              <input type="number" value="{{weasdomModifier}}" class="minisquare">
               <br>
-              <input type="number" value="charismaValue" [(ngModel)]="charismaValue" placeholder="CAR" class="square">
-              <input type="number" value="charismaModifier" [(ngModel)]="charismaModifier" class="minisquare">
+              <input type="number" value="{{character.charisma}}" [(ngModel)]="character.charisma" placeholder="CAR" class="square">
+              <input type="number" value="{{charismaModifier}}" class="minisquare">
             </div>
             <div class="col-8 border">
               <input type="checkbox" value="inspiration" class="inline">
@@ -345,23 +346,23 @@
         <div class="col-4">
           <div class="row">
             <div class="text-center width100">
-              <input type="number" class="square ml-3 mr-3 mt-2 mb-2" value="characterAc" [(ngModel)]="characterAc"
+              <input type="number" class="square ml-3 mr-3 mt-2 mb-2" value="{{character.armorClass}}" [(ngModel)]="character.armorClass"
                 placeholder="CA">
-              <input type="number" class="square ml-3 mr-3 mt-2 mb-2" value="characterInitiative" [(ngModel)]="characterInitiative"
+              <input type="number" class="square ml-3 mr-3 mt-2 mb-2" value="{{character.initiative}}" [(ngModel)]="character.initiative"
                 placeholder="Iniz">
-              <input type="number" class="square ml-3 mr-3 mt-2 mb-2" value="characterSpeed" [(ngModel)]="characterSpeed"
+              <input type="number" class="square ml-3 mr-3 mt-2 mb-2" value="{{character.speed}}" [(ngModel)]="character.speed"
                 placeholder="Vel">
             </div>
           </div>
           <div class="border width100">
             <div class="border">
-              <input type="number" value="characterHp" [(ngModel)]="characterHp" class="minisquare">
+              <input type="number" value="{{character.hp}}" [(ngModel)]="character.hp" class="minisquare">
               <label>
                 Punti ferita totali
               </label>
             </div>
             <div class="text-center">
-              <input type="number" class="rectagleH70px">
+              <input type="number" value="{{character.current_hp}}" [(ngModel)]="character.current_hp" class="rectagleH70px">
               <span>
                 Punti ferita attuali
               </span>

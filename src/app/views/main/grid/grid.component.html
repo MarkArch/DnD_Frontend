@@ -8,6 +8,13 @@
     </div>
   </div>
   <div class="card-body">
+    <div style="float:left;width: 100%;height: 50px;" *ngIf="this.character.privilege=='master'"><select #object>
+        <option>tree</option>
+        <option>horizontal wall</option>
+        <option>vertical wall</option>
+      </select><button (click)="onSetObjectOnGrid(object.value)">Add Object</button><button (click)="onDeleteObjectFromGrid()">Delete
+        Object</button><button (click)="onGridEmpty()">Empty Grid</button><button (click)="onObjectGridEmpty()">Empty
+        Object on Grid</button></div>
     <div class="col-md-8 col-lg-8 float-left over">
       <div [hidden]="!gridSettingVisible" class="card p-2">
         <h5>Set squares number: <input class="HPdim" type="number" [(ngModel)]="x" value="x" (ngModelChange)="onGridInit()">
@@ -92,10 +99,10 @@
             </tbody>
           </table> -->
           <hr>
-           <div class="text-center">
+          <div class="text-center">
             <h3>Last dice throw</h3>
             <div>{{diceThrow}}</div>
-          </div> 
+          </div>
           <hr>
           <div class="text-center">
             <h4>Characters</h4>
@@ -131,7 +138,7 @@
                 <button class="btn btn-block btn-ghost-warning active" type="button">Go back</button>
               </div>
             </div>
-            <div [hidden]="!isMasterSession" class="row">
+            <div [hidden]="character.privilege=='user'" class="row">
               <div class="col-md-5 col-lg-5 pr-1">
                 <input type="text" class="form-control" placeholder="Add a character" #newCharName>
               </div>
@@ -179,9 +186,76 @@
         </tab>
         <tab>
           <ng-template tabHeading><i></i>Buffs</ng-template>
-          To be implemented...
+          <table class="table">
+            <tr>
+              <th>Who</th>
+              <td><select class="custom-select" #charNameTo>
+                  <ng-container *ngFor="let char of sessionPlayers; let indice=index">
+                    <option *ngIf="char.privilege=='user'">{{char.charName}}</option>
+                  </ng-container>
+                </select></td>
+            </tr>
+            <tr>
+              <th>What</th>
+              <td><select class="custom-select" #stat>
+                  <option>Strenght</option>
+                  <option>Dexterity</option>
+                  <option>Constitution</option>
+                  <option>Intelligence</option>
+                  <option>Weasdom</option>
+                  <option>Charisma</option>
+                  <option>Armor Class</option>
+                  <option>Damage roll</option>
+                  <option>Attack roll</option>
+                </select></td>
+            </tr>
+            <tr>
+              <th>Intensity</th>
+              <td><input type="number" style="width:100%" #intensity></td>
+            </tr>
+            <tr>
+              <th>LastFor</th>
+              <td><input type="number" style="width:100%" #lastFor></td>
+            </tr>
+            <tr>
+              <th>Type</th>
+              <td><select class="custom-select" #type>
+                  <option>Aura</option>
+                  <option>Magia</option>
+                  <option>Naturale</option>
+                </select></td>
+            </tr>
+            <tr>
+              <td colspan=2 style="text-align: center"><button class="btn btn-success" style="width: 50%" (click)="onSetBuff(charNameTo.value,stat.value,intensity.value,lastFor.value,type.value)">Buff</button></td>
+            </tr>
+          </table>
+          <div class="text-center" style="width: 100%;">
+            <h4>Your outgoing buffs</h4>
+            <table class="table">
+              <tr>
+                <th>What</th>
+                <th>Intensity</th>
+                <th>LastFor</th>
+                <th>Type</th>
+              </tr>
+              <ng-container *ngFor="let buff of buffs;let a=index"><tr *ngIf="buff.usernameFrom==character.charName" ><td>{{buff.stat}}</td><td>{{buff.intensity}}</td><td>{{buff.lastFor}}</td><td>{{buff.type}}</td></tr></ng-container>
+            </table>
+          </div>
+          <div class="text-center" style="width: 100%;">
+              <h4>Your incoming buffs</h4>
+              <table class="table">
+                <tr>
+                  <th>What</th>
+                  <th>Intensity</th>
+                  <th>LastFor</th>
+                  <th>Type</th>
+                </tr>
+                <ng-container *ngFor="let buff of buffs;let a=index"><tr *ngIf="buff.usernameTo==character.charName" ><td>{{buff.stat}}</td><td>{{buff.intensity}}</td><td>{{buff.lastFor}}</td><td>{{buff.type}}</td></tr></ng-container>
+              </table>
+            </div>
         </tab>
       </tabset>
     </div>
+
   </div>
 </div>
