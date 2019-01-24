@@ -1,4 +1,4 @@
-import { Component, OnInit,OnDestroy, ViewChild, ElementRef, HostBinding } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, HostBinding } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { AnimationBuilder, AnimationPlayer } from '@angular/animations';
 import { SharedVariableService } from '../../../shared/shared-variable.service';
@@ -49,49 +49,72 @@ import { Subscription } from 'rxjs';
   ]
 })
 
-export class GridComponent implements OnInit,OnDestroy {
-  
-  
+export class GridComponent implements OnInit, OnDestroy {
+
+
   constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService, private shareVariable: SharedVariableService) {
     this.service.chooseCharacter("", 0).subscribe(res => {
-        this.shared.character = res; this.character = this.shared.character;
-        this.service.getPositions().subscribe((res: grid[]) => {
-          this.grid = res; for (let position of this.grid) {
-            if (position.charName == this.character.charName) {
-              this.charecterPosition.charName = position.charName;
-              this.charecterPosition.x = position.x;
-              this.charecterPosition.y = position.y;
-            }
+      this.shared.character = res; this.character = this.shared.character;
+      this.service.getPositions().subscribe((res: grid[]) => {
+        this.grid = res; for (let position of this.grid) {
+          if (position.charName == this.character.charName) {
+            this.charecterPosition.charName = position.charName;
+            this.charecterPosition.x = position.x;
+            this.charecterPosition.y = position.y;
           }
-          this.syncroPositions();
-        });
-        this.statInitializer();
-        this.service.getCharacterList().subscribe(res => {
-          console.log("informazioni pg");
-          console.log(res);
-          this.sessionPlayers = res;
-          this.sessionPlayers.forEach(p => {
-            this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
-            this.inModify.push(false);
-            this.inGrid.push(false);
-            this.isFriend.push(false);
-          })
-          this.service.getBuff().subscribe((res: buff[]) => { this.buffs = res;});
-          this.service.getTurn().subscribe(res => {
-            this.turn = +res;
-            while (this.turn >= this.sessionPlayers.length) {
-              this.turn = this.turn - this.sessionPlayers.length;
+        }
+        this.syncroPositions();
+      });
+      this.service.getCharacterList().subscribe(res => {
+        console.log("informazioni pg");
+        console.log(res);
+        this.sessionPlayers = res;
+        this.sessionPlayers.forEach(p => {
+          this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
+          this.inModify.push(false);
+          this.inGrid.push(false);
+          this.isFriend.push(false);
+        })
+        this.service.getBuff().subscribe((res: buff[]) => {
+          this.strenghtBuff = 0;
+          this.dexterityBuff = 0;
+          this.constitutionBuff = 0;
+          this.weasdomBuff = 0;
+          this.intelligenceBuff = 0;
+          this.charismatBuff = 0;
+          this.buffs = res; this.buffs.forEach(buff => {
+            if (buff.usernameTo == this.character.charName) {
+              if (buff.stat == 'Strenght')
+                this.strenghtBuff = this.strenghtBuff + buff.intensity
+              else if (buff.stat == 'Dexterity')
+                this.dexterityBuff = this.dexterityBuff + buff.intensity
+              else if (buff.stat == 'Constitution')
+                this.constitutionBuff = this.constitutionBuff + buff.intensity
+              else if (buff.stat == 'Intelligence')
+                this.intelligenceBuff = this.intelligenceBuff + buff.intensity
+              else if (buff.stat == 'Weasdom')
+                this.weasdomBuff = this.weasdomBuff + buff.intensity
+              else if (buff.stat == 'Charisma')
+                this.charismatBuff = this.charismatBuff + buff.intensity
             }
-
-            this.syncroTurn();
-            this.syncroCharacter();
-            this.syncroDice();
-            this.syncroPing();
-          //  this.syncroBuff();
           });
+          this.statInitializer();
         });
-      }, err => this.router.navigate(['/campaign']));
-    
+        this.service.getTurn().subscribe(res => {
+          this.turn = +res;
+          while (this.turn >= this.sessionPlayers.length) {
+            this.turn = this.turn - this.sessionPlayers.length;
+          }
+
+          this.syncroTurn();
+          this.syncroCharacter();
+          this.syncroDice();
+          this.syncroPing();
+          //  this.syncroBuff();
+        });
+      });
+    }, err => this.router.navigate(['/campaign']));
+
   }
 
   public diceThrow;
@@ -108,11 +131,17 @@ export class GridComponent implements OnInit,OnDestroy {
   deleteObjectFromGrid = false;
   objectName: String = "";
   buffs: buff[] = [];
-  syncroCharacterSubscription:Subscription;
+  syncroCharacterSubscription: Subscription;
   syncroPingSubcription: Subscription;
-  syncroTurnSubscription:Subscription;
-  syncroPositionsSubscription:Subscription;
+  syncroTurnSubscription: Subscription;
+  syncroPositionsSubscription: Subscription;
   syncroDiceSubscription: Subscription;
+  strenghtBuff: number = 0;
+  dexterityBuff: number = 0;
+  constitutionBuff: number = 0;
+  intelligenceBuff: number = 0;
+  weasdomBuff: number = 0;
+  charismatBuff: number = 0;
   public isFriend = [];
   public inModify = [];
   public inGrid = [];
@@ -131,7 +160,7 @@ export class GridComponent implements OnInit,OnDestroy {
   { name: 'd4.svg', type: 'd4', number: 1, value: 0 },
   { name: 'dp.svg', type: 'd%', number: 1, value: 0 }];
   private charStats = ['For', 'Des', 'Cos', 'Int', 'Sag', 'Car'];
-  public stats: { name: string, value: number, modifier: number, tempValue: number, totValue: number, savingThrow: number }[] = [];
+  public stats: { name: string, value: number, modifier: number, tempValue: number, buffModifier: number, totValue: number, savingThrow: number }[] = [];
 
 
 
@@ -148,14 +177,14 @@ export class GridComponent implements OnInit,OnDestroy {
         this.turn = res; while (this.turn >= this.sessionPlayers.length) {
           this.turn = this.turn - this.sessionPlayers.length;
         }
-        if(this.sessionPlayers[this.turn].charName==this.character.charName){
+        if (this.sessionPlayers[this.turn].charName == this.character.charName) {
           this.service.getBuffUpdate().subscribe();
         }
       });
     }
   }
   syncroPositions() {
-    this.syncroPositionsSubscription=this.service.syncroPositions().subscribe((res: grid[]) => {
+    this.syncroPositionsSubscription = this.service.syncroPositions().subscribe((res: grid[]) => {
       this.grid = [];
       this.grid = res; for (let position of this.grid) {
         if (position.charName == this.character.charName) {
@@ -217,7 +246,7 @@ export class GridComponent implements OnInit,OnDestroy {
     return a;
   }
   syncroCharacter() {
-    this.syncroCharacterSubscription=this.service.getSyncroCharacterList().subscribe(res => {
+    this.syncroCharacterSubscription = this.service.getSyncroCharacterList().subscribe(res => {
       console.log('syncroturn' + this.turn);
       console.log("informazioni pg");
       this.sessionPlayers = res;
@@ -226,12 +255,36 @@ export class GridComponent implements OnInit,OnDestroy {
         this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
         this.inModify.push(false);
       })
-      this.service.getBuff().subscribe((res:buff[])=>{this.buffs=res,this.syncroCharacter()})
+      this.service.getBuff().subscribe((res: buff[]) => {
+        this.buffs = res;
+        this.strenghtBuff = 0;
+        this.dexterityBuff = 0;
+        this.constitutionBuff = 0;
+        this.weasdomBuff = 0;
+        this.intelligenceBuff = 0;
+        this.charismatBuff = 0;
+        this.buffs.forEach(buff => {
+          if (buff.usernameTo == this.character.charName) {
+            if (buff.stat == 'Strenght')
+              this.strenghtBuff = this.strenghtBuff + buff.intensity
+            else if (buff.stat == 'Dexterity')
+              this.dexterityBuff = this.dexterityBuff + buff.intensity
+            else if (buff.stat == 'Constitution')
+              this.constitutionBuff = this.constitutionBuff + buff.intensity
+            else if (buff.stat == 'Intelligence')
+              this.intelligenceBuff = this.intelligenceBuff + buff.intensity
+            else if (buff.stat == 'Weasdom')
+              this.weasdomBuff = this.weasdomBuff + buff.intensity
+            else if (buff.stat == 'Charisma')
+              this.charismatBuff = this.charismatBuff + buff.intensity
+          }
+        }); this.statInitializer(); this.syncroCharacter()
+      })
     });
   }
 
   syncroTurn() {
-    this.syncroTurnSubscription=this.service.getSyncroTurn().subscribe(res => {
+    this.syncroTurnSubscription = this.service.getSyncroTurn().subscribe(res => {
       this.turn = +res;
       while (this.turn >= this.sessionPlayers.length) {
         this.turn = this.turn - this.sessionPlayers.length;
@@ -241,11 +294,13 @@ export class GridComponent implements OnInit,OnDestroy {
   }
 
   statInitializer() {
+    this.stats = [];
     this.stats.push({
       name: "Strenght",
       value: this.character.strenght,
       modifier: Math.floor((this.character.strenght - 10) / 2),
       tempValue: this.character.temporary_strenght,
+      buffModifier: this.strenghtBuff,
       totValue: Math.floor((this.character.strenght + this.character.temporary_strenght - 10) / 2),
       savingThrow: this.character.savingThrow_strenght
     });
@@ -254,6 +309,7 @@ export class GridComponent implements OnInit,OnDestroy {
       value: this.character.constitution,
       modifier: Math.floor((this.character.constitution - 10) / 2),
       tempValue: this.character.temporary_constitution,
+      buffModifier: this.constitutionBuff,
       totValue: Math.floor((this.character.constitution + this.character.temporary_constitution - 10) / 2),
       savingThrow: this.character.savingThrow_constitution
     });
@@ -262,6 +318,7 @@ export class GridComponent implements OnInit,OnDestroy {
       value: this.character.dexterity,
       modifier: Math.floor((this.character.dexterity - 10) / 2),
       tempValue: this.character.temporary_dexterity,
+      buffModifier: this.dexterityBuff,
       totValue: Math.floor((this.character.dexterity + this.character.temporary_dexterity - 10) / 2),
       savingThrow: this.character.savingThrow_dexterity
     });
@@ -270,6 +327,7 @@ export class GridComponent implements OnInit,OnDestroy {
       value: this.character.intelligence,
       modifier: Math.floor((this.character.intelligence - 10) / 2),
       tempValue: this.character.temporary_intelligence,
+      buffModifier: this.intelligenceBuff,
       totValue: Math.floor((this.character.intelligence + this.character.temporary_intelligence - 10) / 2),
       savingThrow: this.character.savingThrow_intelligence
     });
@@ -278,6 +336,7 @@ export class GridComponent implements OnInit,OnDestroy {
       value: this.character.weasdom,
       modifier: Math.floor((this.character.weasdom - 10) / 2),
       tempValue: this.character.temporary_weasdom,
+      buffModifier: this.weasdomBuff,
       totValue: Math.floor((this.character.weasdom + this.character.temporary_weasdom - 10) / 2),
       savingThrow: this.character.savingThrow_weasdom
     });
@@ -286,6 +345,7 @@ export class GridComponent implements OnInit,OnDestroy {
       value: this.character.charisma,
       modifier: Math.floor((this.character.charisma - 10) / 2),
       tempValue: this.character.temporary_charisma,
+      buffModifier: this.charismatBuff,
       totValue: Math.floor((this.character.charisma + this.character.temporary_charisma - 10) / 2),
       savingThrow: this.character.savingThrow_charisma
     });
@@ -468,7 +528,7 @@ export class GridComponent implements OnInit,OnDestroy {
     this.service.registerNpc(npc).subscribe();
   }
   syncroDice() {
-    this.syncroDiceSubscription=this.service.syncroDice().subscribe((res: any) => {
+    this.syncroDiceSubscription = this.service.syncroDice().subscribe((res: any) => {
       this.diceThrow = res.ref_charName + " ha tirato un " + res.dice_type + " facendo un bel " + res.dice_value;
       this.syncroDice()
     });
@@ -492,7 +552,7 @@ export class GridComponent implements OnInit,OnDestroy {
   }
 
   syncroPing() {
-    this.syncroPingSubcription= this.service.syncroPing().subscribe((res: grid) => {
+    this.syncroPingSubcription = this.service.syncroPing().subscribe((res: grid) => {
       let a: grid = new grid();
       a.x = 99;
       a.y = 99;
@@ -516,20 +576,20 @@ export class GridComponent implements OnInit,OnDestroy {
     });
   }
   onSetObjectOnGrid(objectName) {
-    if(this.setObjectOnGrid == true){
-      this.setObjectOnGrid=false;
-    }else{
-      this.setObjectOnGrid=true;
-      this.deleteObjectFromGrid=false;
+    if (this.setObjectOnGrid == true) {
+      this.setObjectOnGrid = false;
+    } else {
+      this.setObjectOnGrid = true;
+      this.deleteObjectFromGrid = false;
     }
     this.objectName = objectName;
   }
   onDeleteObjectFromGrid() {
-    if(this.deleteObjectFromGrid == true){
-      this.deleteObjectFromGrid=false;
-    }else{
-      this.deleteObjectFromGrid=true;
-      this.setObjectOnGrid=false;
+    if (this.deleteObjectFromGrid == true) {
+      this.deleteObjectFromGrid = false;
+    } else {
+      this.deleteObjectFromGrid = true;
+      this.setObjectOnGrid = false;
     }
   }
   onGridEmpty() {

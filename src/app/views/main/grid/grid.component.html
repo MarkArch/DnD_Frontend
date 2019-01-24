@@ -17,8 +17,8 @@
             <option>vertical wall</option>
           </select>
           <div class="input-group-append">
-            <button (click)="onSetObjectOnGrid(object.value)" type="button" class="btn btn-outline-dark">Add Object</button>
-            <button class="btn btn-outline-dark" type="button" (click)="onDeleteObjectFromGrid()">Delete Object</button>
+            <button (click)="onSetObjectOnGrid(object.value)" type="button" [ngClass]="setObjectOnGrid==false?'btn btn-outline-dark':'btn btn-dark'">Add Object</button>
+            <button type="button" (click)="onDeleteObjectFromGrid()" [ngClass]="deleteObjectFromGrid==false?'btn btn-outline-dark':'btn btn-dark'">Delete Object</button>
             <button class="btn btn-outline-dark" type="button" (click)="onGridEmpty()">Empty Grid</button>
             <button class="btn btn-outline-dark" type="button" (click)="onObjectGridEmpty()">Empty Object on Grid</button>
           </div>
@@ -57,6 +57,7 @@
                     <th class="pl-2 pb-1">Value</th>
                     <th class="pl-2 pb-1">Mod</th>
                     <th class="pl-2 pb-1">Temp</th>
+                    <th class="pl-2 pb-1">Buff</th>
                     <th class="pl-2 pb-1">Tot</th>
                     <th class="pl-2 pb-1 pr-1">TS</th>
                   </tr>
@@ -66,10 +67,11 @@
                   <tr *ngFor="let val of stats; let i = index">
                     <td class="text-center left-radius">{{val.name.substring(0,3)}}</td>
                     <td class="text-center">{{val.value}}</td>
-                    <td class="text-center">{{val.modifier > 0 ? "+" : "-"}}{{val.modifier}}</td>
+                    <td class="text-center">{{val.modifier > 0 ? "+" : ""}}{{val.modifier}}</td>
                     <td class="text-center"><input class="dim" type="number" name="temp" [(ngModel)]="val.tempValue"
                         value="{{val.tempValue}}" (change)="onTempModify(i)"></td>
-                    <td class="text-center">{{val.totValue > 0 ? "+" : "-"}}{{val.totValue}}</td>
+                    <td class="text-center">{{val.buffModifier > 0 ? "+" : ""}}{{val.buffModifier}}</td>
+                    <td class="text-center">{{val.totValue > 0 ? "+" : ""}}{{val.totValue}}</td>
                     <td class="text-center right-radius"><i *ngIf="val.savingThrow==1" class="fas fa-star" style="color:  gold"></i>
                       <i *ngIf="val.savingThrow==0" class="far fa-star" style="color: rgb(199, 197, 197)"></i></td>
                   </tr>
@@ -201,7 +203,7 @@
               <th>Who</th>
               <td><select class="custom-select" #charNameTo>
                   <ng-container *ngFor="let char of sessionPlayers; let indice=index">
-                    <option *ngIf="char.privilege=='user'">{{char.charName}}</option>
+                    <option *ngIf="char.current_hp>0">{{char.charName}}</option>
                   </ng-container>
                 </select></td>
             </tr>
