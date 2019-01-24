@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
@@ -10,6 +10,7 @@ import { MainRoutingModule } from './main-routing.module';
 import { GridComponent } from './grid/grid.component';
 import { SheetComponent } from './sheet/sheet.component';
 import { DiaryComponent } from './diary/diary.component';
+import { PdfViewerModule } from 'ng2-pdf-viewer';
 
 @NgModule({
   imports: [
@@ -18,7 +19,9 @@ import { DiaryComponent } from './diary/diary.component';
     CommonModule,
     TabsModule.forRoot(),
     TooltipModule.forRoot(),
-    CKEditorModule
+    CKEditorModule,
+    PdfViewerModule,
+    ReactiveFormsModule 
   ],
   declarations: [ 
     HomeComponent, 

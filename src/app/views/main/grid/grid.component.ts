@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostBinding } from '@angular/core';
+import { Component, OnInit,OnDestroy, ViewChild, ElementRef, HostBinding } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { AnimationBuilder, AnimationPlayer } from '@angular/animations';
 import { SharedVariableService } from '../../../shared/shared-variable.service';
@@ -9,6 +9,7 @@ import { RestServiceService } from '../../../shared/rest-service.service';
 import { grid } from '../../../class/grid';
 import { buff } from '../../../class/buff';
 import { st } from '@angular/core/src/render3';
+import { Subscription } from 'rxjs';
 // import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
@@ -48,11 +49,11 @@ import { st } from '@angular/core/src/render3';
   ]
 })
 
-export class GridComponent implements OnInit {
-
+export class GridComponent implements OnInit,OnDestroy {
+  
+  
   constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService, private shareVariable: SharedVariableService) {
-    if (this.shared.character == null) {
-      this.service.chooseCharacter("", 0).subscribe(res => {
+    this.service.chooseCharacter("", 0).subscribe(res => {
         this.shared.character = res; this.character = this.shared.character;
         this.service.getPositions().subscribe((res: grid[]) => {
           this.grid = res; for (let position of this.grid) {
@@ -90,42 +91,7 @@ export class GridComponent implements OnInit {
           });
         });
       }, err => this.router.navigate(['/campaign']));
-    } else {
-      this.character = this.shared.character; this.service.getPositions().subscribe((res: grid[]) => {
-        this.grid = res; for (let position of this.grid) {
-          if (position.charName == this.character.charName) {
-            this.charecterPosition.charName = position.charName;
-            this.charecterPosition.x = position.x;
-            this.charecterPosition.y = position.y;
-          }
-        }
-        this.syncroPositions();
-      });
-      this.statInitializer();
-      this.service.getCharacterList().subscribe(res => {
-        console.log("informazioni pg");
-        console.log(res)
-        this.sessionPlayers = res;
-        this.sessionPlayers.forEach(p => {
-          this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
-          this.inModify.push(false);
-          this.inGrid.push(false);
-          this.isFriend.push(false);
-        })
-        this.service.getBuff().subscribe((res: buff[]) => { this.buffs = res}); 
-        this.service.getTurn().subscribe(res => {
-          this.turn = +res;
-          while (this.turn >= this.sessionPlayers.length) {
-            this.turn = this.turn - this.sessionPlayers.length;
-          }
-          this.syncroTurn();
-          this.syncroCharacter();
-          this.syncroDice();
-          this.syncroPing();
-       //   this.syncroBuff();
-        })
-      });
-    }
+    
   }
 
   public diceThrow;
@@ -142,6 +108,11 @@ export class GridComponent implements OnInit {
   deleteObjectFromGrid = false;
   objectName: String = "";
   buffs: buff[] = [];
+  syncroCharacterSubscription:Subscription;
+  syncroPingSubcription: Subscription;
+  syncroTurnSubscription:Subscription;
+  syncroPositionsSubscription:Subscription;
+  syncroDiceSubscription: Subscription;
   public isFriend = [];
   public inModify = [];
   public inGrid = [];
@@ -184,7 +155,7 @@ export class GridComponent implements OnInit {
     }
   }
   syncroPositions() {
-    this.service.syncroPositions().subscribe((res: grid[]) => {
+    this.syncroPositionsSubscription=this.service.syncroPositions().subscribe((res: grid[]) => {
       this.grid = [];
       this.grid = res; for (let position of this.grid) {
         if (position.charName == this.character.charName) {
@@ -246,7 +217,7 @@ export class GridComponent implements OnInit {
     return a;
   }
   syncroCharacter() {
-    this.service.getSyncroCharacterList().subscribe(res => {
+    this.syncroCharacterSubscription=this.service.getSyncroCharacterList().subscribe(res => {
       console.log('syncroturn' + this.turn);
       console.log("informazioni pg");
       this.sessionPlayers = res;
@@ -260,7 +231,7 @@ export class GridComponent implements OnInit {
   }
 
   syncroTurn() {
-    this.service.getSyncroTurn().subscribe(res => {
+    this.syncroTurnSubscription=this.service.getSyncroTurn().subscribe(res => {
       this.turn = +res;
       while (this.turn >= this.sessionPlayers.length) {
         this.turn = this.turn - this.sessionPlayers.length;
@@ -453,9 +424,9 @@ export class GridComponent implements OnInit {
       this.settingOnGrid = false;
       this.possibleMoves = [];
     } else if (this.setObjectOnGrid == true) {
-      this.service.setObjectOnGrid(this.objectName, x, y).subscribe(res => { this.setObjectOnGrid = false });
+      this.service.setObjectOnGrid(this.objectName, x, y).subscribe();
     } else if (this.deleteObjectFromGrid == true) {
-      this.service.deleteObjectOnGrid("", x, y).subscribe(res => { this.deleteObjectFromGrid = false });;
+      this.service.deleteObjectOnGrid("", x, y).subscribe();
     } else {
       this.service.pingGrid(x, y).subscribe();
     }
@@ -497,7 +468,7 @@ export class GridComponent implements OnInit {
     this.service.registerNpc(npc).subscribe();
   }
   syncroDice() {
-    this.service.syncroDice().subscribe((res: any) => {
+    this.syncroDiceSubscription=this.service.syncroDice().subscribe((res: any) => {
       this.diceThrow = res.ref_charName + " ha tirato un " + res.dice_type + " facendo un bel " + res.dice_value;
       this.syncroDice()
     });
@@ -521,7 +492,7 @@ export class GridComponent implements OnInit {
   }
 
   syncroPing() {
-    this.service.syncroPing().subscribe((res: grid) => {
+    this.syncroPingSubcription= this.service.syncroPing().subscribe((res: grid) => {
       let a: grid = new grid();
       a.x = 99;
       a.y = 99;
@@ -545,11 +516,21 @@ export class GridComponent implements OnInit {
     });
   }
   onSetObjectOnGrid(objectName) {
-    this.setObjectOnGrid = true;
+    if(this.setObjectOnGrid == true){
+      this.setObjectOnGrid=false;
+    }else{
+      this.setObjectOnGrid=true;
+      this.deleteObjectFromGrid=false;
+    }
     this.objectName = objectName;
   }
   onDeleteObjectFromGrid() {
-    this.deleteObjectFromGrid = true;
+    if(this.deleteObjectFromGrid == true){
+      this.deleteObjectFromGrid=false;
+    }else{
+      this.deleteObjectFromGrid=true;
+      this.setObjectOnGrid=false;
+    }
   }
   onGridEmpty() {
     this.service.emptyGrid().subscribe();
@@ -560,5 +541,12 @@ export class GridComponent implements OnInit {
   onSetBuff(charNameTo, stat, intensity, lastFor, type) {
     console.log(charNameTo, stat, intensity, lastFor, type);
     this.service.postBuff(this.character.charName, charNameTo, stat, intensity, lastFor, type).subscribe();
+  }
+  ngOnDestroy(): void {
+    this.syncroCharacterSubscription.unsubscribe();
+    this.syncroDiceSubscription.unsubscribe();
+    this.syncroPositionsSubscription.unsubscribe();
+    this.syncroTurnSubscription.unsubscribe();
+    this.syncroPingSubcription.unsubscribe();
   }
 }

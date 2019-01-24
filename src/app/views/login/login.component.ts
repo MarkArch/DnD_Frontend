@@ -14,6 +14,7 @@ export class LoginComponent implements OnInit {
 
   }
   public accounts: postlogin[] = [];
+  isLoginFailed=false;
   constructor(public route: ActivatedRoute, private fb: FacebookService, public router: Router, private service: RestServiceService, private shared: SharedVariableService) {
     let initParams: InitParams = {
       appId: '285738238803032',
@@ -32,7 +33,7 @@ export class LoginComponent implements OnInit {
     this.service.login(username, password).subscribe(res => {
       this.router.navigate(['/campaign']);
     }, err => {
-      console.log(err)
+      this.isLoginFailed=true;
     });
   }
   onSubmitFacebookLogin(socialPlatform: string) {

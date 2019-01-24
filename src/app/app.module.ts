@@ -56,6 +56,7 @@ import { postlogin } from './class/postlogin';
 import { SharedVariableService } from './shared/shared-variable.service';
 import { CookieService } from 'ngx-cookie-service';
 import { FacebookModule } from 'ngx-facebook';
+import { PdfViewerModule} from 'ng2-pdf-viewer'
 export function getAuthServiceConfigs() {
   let config = new AuthServiceConfig(
       [
@@ -76,6 +77,7 @@ export function getAuthServiceConfigs() {
 
 @NgModule({
   imports: [
+    PdfViewerModule,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,

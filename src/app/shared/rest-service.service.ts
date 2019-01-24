@@ -127,4 +127,7 @@ export class RestServiceService {
     b.type=type;
     return this.http.post("http://localhost:8080/DeDManager/Buff",b, {withCredentials:true})
   }
+  multipleUpdateOnPg(pg:character){
+    return this.http.put("http://localhost:8080/DeDManager/setPg",pg, {withCredentials:true})
+  }
 }

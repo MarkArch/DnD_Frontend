@@ -53,3 +53,25 @@ display: block
 .margin-top40 {
     margin-top: 40px
 }
+
+.container {
+    margin: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  #input-form {
+      position: absolute;
+      z-index: 1;
+      & input{
+          position: absolute;
+          background: transparent;
+          border: 1px solid lightblue;
+          text-align: center
+      }
+      & label{
+        position: absolute;
+        background: transparent;
+        text-align: center
+      }
+  }
