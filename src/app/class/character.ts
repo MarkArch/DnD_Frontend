@@ -9,9 +9,9 @@ export class character{
     hit_dice:String ="";
     diary:String ="";
     class1:String ="";
-    class2:String ="";
-    class3:String ="";
-    class4:String ="";
+    grid_dimension:String ="";
+    grid_zoom:number =0;
+    show_all:boolean =false;
     class5:String ="";
     class6:String ="";
     level:number =0;

@@ -70,7 +70,8 @@
   <div class="modal-body">
     <div class="card" *ngFor="let account of currentAccount">
       <div class="card-body row p-2">
-        <div class="col-3 text-center border-right clickable" (click)="onSelectCharacter(account.charName,account.session_id)"><i class="fas fa-{{account.alive==true?account.gridNumber:'skull'}} fa-2x"></i></div>
+        <div class="col-3 text-center border-right clickable align-middle" (click)="onSelectCharacter(account.charName,account.session_id) "><h6> </h6><i
+            class="fas fa-{{account.alive==true?account.gridNumber:'skull'}} fa-2x"></i></div>
         <div class="col-3 text-center clickable" (click)="onSelectCharacter(account.charName,account.session_id)">
           <h6>Name: </h6>{{account.charName}}
         </div>
