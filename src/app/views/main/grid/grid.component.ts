@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 import { FileUploader } from 'ng2-file-upload';
 // import { ChangeDetectorRef } from '@angular/core';
 
-const URL = 'http://localhost/DeDManager/upload';
+const URL = 'http://localhost:8080/DeDManager/upload';
 
 @Component({
   selector: 'app-grid',
@@ -553,6 +553,7 @@ export class GridComponent implements OnInit, OnDestroy {
     if (this.character.privilege == 'master' && this.sessionPlayers[i].privilege == 'master') {
       this.service.chooseCharacter(this.sessionPlayers[i].charName, this.sessionPlayers[i].session_id).subscribe(res => {
         this.character = res;
+        this.statInitializer();
         this.service.getPositions().subscribe((res: grid[]) => {
           this.grid = res; for (let position of this.grid) {
             if (position.charName == this.character.charName) {
@@ -623,7 +624,7 @@ export class GridComponent implements OnInit, OnDestroy {
     this.syncroPingSubcription.unsubscribe();
   }
   tryToastrNotification() {
-    this.toastr.success('Hello World')
+    this.toastr.success('Hello World');
   }
   onKeydown(event,value) {
     if (event.key === "Enter") {
