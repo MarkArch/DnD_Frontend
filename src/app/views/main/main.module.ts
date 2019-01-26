@@ -11,6 +11,7 @@ import { GridComponent } from './grid/grid.component';
 import { SheetComponent } from './sheet/sheet.component';
 import { DiaryComponent } from './diary/diary.component';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
+import { FileSelectDirective } from 'ng2-file-upload';
 
 @NgModule({
   imports: [
@@ -21,10 +22,10 @@ import { PdfViewerModule } from 'ng2-pdf-viewer';
     TooltipModule.forRoot(),
     CKEditorModule,
     PdfViewerModule,
-    ReactiveFormsModule 
+    ReactiveFormsModule
   ],
-  declarations: [ 
-    HomeComponent, 
-    GridComponent, SheetComponent, DiaryComponent ]
+  declarations: [
+    HomeComponent,
+    GridComponent, SheetComponent, DiaryComponent, FileSelectDirective]
 })
 export class MainModule { }

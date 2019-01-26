@@ -10,7 +10,11 @@ import { grid } from '../../../class/grid';
 import { buff } from '../../../class/buff';
 import { st } from '@angular/core/src/render3';
 import { Subscription } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { FileUploader } from 'ng2-file-upload';
 // import { ChangeDetectorRef } from '@angular/core';
+
+const URL = 'http://localhost/DeDManager/upload';
 
 @Component({
   selector: 'app-grid',
@@ -52,7 +56,7 @@ import { Subscription } from 'rxjs';
 export class GridComponent implements OnInit, OnDestroy {
 
 
-  constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService, private shareVariable: SharedVariableService) {
+  constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService, private shareVariable: SharedVariableService, private toastr: ToastrService) {
     this.service.chooseCharacter("", 0).subscribe(res => {
       this.shared.character = res; this.character = this.shared.character;
       this.service.getPositions().subscribe((res: grid[]) => {
@@ -116,7 +120,6 @@ export class GridComponent implements OnInit, OnDestroy {
     }, err => this.router.navigate(['/campaign']));
 
   }
-
   public diceThrow;
   settingOnGrid = false;
   isMasterSession = false;
@@ -142,6 +145,8 @@ export class GridComponent implements OnInit, OnDestroy {
   intelligenceBuff: number = 0;
   weasdomBuff: number = 0;
   charismatBuff: number = 0;
+  notify=false;
+  uploader:FileUploader = new FileUploader({url: URL});
   public isFriend = [];
   public inModify = [];
   public inGrid = [];
@@ -184,16 +189,25 @@ export class GridComponent implements OnInit, OnDestroy {
     }
   }
   syncroPositions() {
-    this.syncroPositionsSubscription = this.service.syncroPositions().subscribe((res: grid[]) => {
-      this.grid = [];
-      this.grid = res; for (let position of this.grid) {
-        if (position.charName == this.character.charName) {
-          this.charecterPosition.charName = position.charName;
-          this.charecterPosition.x = position.x;
-          this.charecterPosition.y = position.y;
-        }
+    this.syncroPositionsSubscription = this.service.syncroPositions().subscribe((res: String) => {
+      console.log(res);
+      if (res == 'positions') {
+        this.service.getPositions().subscribe((res: grid[]) => {
+          this.grid = res; for (let position of this.grid) {
+            if (position.charName == this.character.charName) {
+              this.charecterPosition.charName = position.charName;
+              this.charecterPosition.x = position.x;
+              this.charecterPosition.y = position.y;
+            }
+          }
+          this.syncroPositions();
+        });
+      } else if (res == 'notification') {
+        this.service.getNotification().subscribe(res => {
+          this.toastr.info('The Master say: '+res);
+          this.syncroPositions();
+        })
       }
-      this.syncroPositions();
     });
   }
   searchCharacterOnGrid(x, y): String {
@@ -352,7 +366,7 @@ export class GridComponent implements OnInit, OnDestroy {
   }
 
   onChangeAttribute(name: String, value: String) {
-    this.service.updatePg(name, value).subscribe();
+    this.service.updatePg(name, value).subscribe(res => { this.toastr.success('Your update was successful') }, err => { this.toastr.error('Something went wrong, please try again later') });
   }
 
   onTempModify(i) {
@@ -530,6 +544,7 @@ export class GridComponent implements OnInit, OnDestroy {
   syncroDice() {
     this.syncroDiceSubscription = this.service.syncroDice().subscribe((res: any) => {
       this.diceThrow = res.ref_charName + " ha tirato un " + res.dice_type + " facendo un bel " + res.dice_value;
+      this.toastr.info(this.diceThrow);
       this.syncroDice()
     });
   }
@@ -575,14 +590,13 @@ export class GridComponent implements OnInit, OnDestroy {
       this.syncroPing();
     });
   }
-  onSetObjectOnGrid(objectName) {
+  onSetObjectOnGrid() {
     if (this.setObjectOnGrid == true) {
       this.setObjectOnGrid = false;
     } else {
       this.setObjectOnGrid = true;
       this.deleteObjectFromGrid = false;
     }
-    this.objectName = objectName;
   }
   onDeleteObjectFromGrid() {
     if (this.deleteObjectFromGrid == true) {
@@ -599,8 +613,7 @@ export class GridComponent implements OnInit, OnDestroy {
     this.service.emptyObjectGrid().subscribe();
   }
   onSetBuff(charNameTo, stat, intensity, lastFor, type) {
-    console.log(charNameTo, stat, intensity, lastFor, type);
-    this.service.postBuff(this.character.charName, charNameTo, stat, intensity, lastFor, type).subscribe();
+    this.service.postBuff(this.character.charName, charNameTo, stat, intensity, lastFor, type).subscribe(res=>{this.toastr.success('You buff was successful')},err=>{this.toastr.error('Something went wrong, please try again later')});
   }
   ngOnDestroy(): void {
     this.syncroCharacterSubscription.unsubscribe();
@@ -608,5 +621,19 @@ export class GridComponent implements OnInit, OnDestroy {
     this.syncroPositionsSubscription.unsubscribe();
     this.syncroTurnSubscription.unsubscribe();
     this.syncroPingSubcription.unsubscribe();
+  }
+  tryToastrNotification() {
+    this.toastr.success('Hello World')
+  }
+  onKeydown(event,value) {
+    if (event.key === "Enter") {
+      this.service.postNotification(value).subscribe();
+    }
+  }
+  onChange(event){
+    console.log(event);
+  }
+  saveFile(file){
+    console.log(file.value);
   }
 }

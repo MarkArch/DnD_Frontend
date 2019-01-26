@@ -3,6 +3,7 @@ import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import Alignment from '@ckeditor/ckeditor5-alignment/src/alignment';
 import { RestServiceService } from '../../../shared/rest-service.service';
 import { SharedVariableService } from '../../../shared/shared-variable.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-diary',
@@ -11,7 +12,7 @@ import { SharedVariableService } from '../../../shared/shared-variable.service';
 })
 export class DiaryComponent implements OnInit {
 
-  constructor(private service: RestServiceService, private shared: SharedVariableService) {
+  constructor(private service: RestServiceService, private shared: SharedVariableService, private toastr: ToastrService) {
     this.service.chooseCharacter('', 0).subscribe( res => {
       console.log(res);
       this.model.editorData = res.diary;
@@ -36,10 +37,11 @@ public config = {
 
   onChangeAttribute(char: String,value:String){
     this.service.updatePg(char,value).subscribe( res => {
+      this.toastr.success('Your upload was successful');
       this.service.chooseCharacter('', 0).subscribe( res => {
         this.model.editorData = res.diary;
       });
-    });
+    },err=>{this.toastr.error('There was an error while trying to process your request, please try again later')});
   }
 
   onResetDiary() {

@@ -70,13 +70,12 @@
   <div class="modal-body">
     <div class="card" *ngFor="let account of currentAccount">
       <div class="card-body row p-2">
-        <div class="col-3 border-right clickable" (click)="onSelectCharacter(account.charName,account.session_id)"><i
-            class="fas fa-dragon"></i></div>
+        <div class="col-3 text-center border-right clickable" (click)="onSelectCharacter(account.charName,account.session_id)"><i class="fas fa-{{account.alive==true?account.gridNumber:'skull'}} fa-2x"></i></div>
         <div class="col-3 text-center clickable" (click)="onSelectCharacter(account.charName,account.session_id)">
           <h6>Name: </h6>{{account.charName}}
         </div>
         <div class="col-3 text-center clickable" (click)="onSelectCharacter(account.charName,account.session_id)">
-          <h6>Alive: </h6>Flavio no
+          <h6>Alive: </h6>{{account.alive}}
         </div>
         <!-- <div class="col-3 text-center clickable" (click)="onSelectCharacter()"><h6>Race: </h6> </div>
         <div class="col-3 text-center clickable" (click)="onSelectCharacter()"><h6>LV: </h6> 9</div> -->

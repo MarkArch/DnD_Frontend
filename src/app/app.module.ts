@@ -57,6 +57,8 @@ import { SharedVariableService } from './shared/shared-variable.service';
 import { CookieService } from 'ngx-cookie-service';
 import { FacebookModule } from 'ngx-facebook';
 import { PdfViewerModule} from 'ng2-pdf-viewer'
+import { ToastrModule } from 'ngx-toastr';
+import { FileSelectDirective } from 'ng2-file-upload';
 export function getAuthServiceConfigs() {
   let config = new AuthServiceConfig(
       [
@@ -92,7 +94,8 @@ export function getAuthServiceConfigs() {
     ModalModule.forRoot(),
     HttpClientModule,
     CKEditorModule,
-    FacebookModule.forRoot()
+    FacebookModule.forRoot(),
+    ToastrModule.forRoot({maxOpened:5,newestOnTop:true,autoDismiss:true})
   ],
   declarations: [
     AppComponent,

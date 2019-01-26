@@ -4,4 +4,5 @@ export class postlogin{
     public session_name:string;
     public session_master:string;
     public alive:boolean;
+    public gridNumber:String;
 }

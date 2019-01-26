@@ -8,20 +8,29 @@
     </div>
   </div>
   <div class="card-body">
-    <div style="width: 700px">
+    <div style="width: 100%">
       <div class="input-group mb-3" *ngIf="this.character.privilege=='master'">
         <div class="input-group">
-          <select #object class="custom-select" style="width: 30%">
-            <option>tree</option>
-            <option>horizontal wall</option>
-            <option>vertical wall</option>
-          </select>
+          <ng-container style="width: 30%" *ngIf="setObjectOnGrid==true">
+            <select #object class="custom-select" (click)="objectName=object.value">
+              <option>tree</option>
+              <option>horizontal wall</option>
+              <option>vertical wall</option>
+            </select>
+          </ng-container>
           <div class="input-group-append">
-            <button (click)="onSetObjectOnGrid(object.value)" type="button" [ngClass]="setObjectOnGrid==false?'btn btn-outline-dark':'btn btn-dark'">Add Object</button>
-            <button type="button" (click)="onDeleteObjectFromGrid()" [ngClass]="deleteObjectFromGrid==false?'btn btn-outline-dark':'btn btn-dark'">Delete Object</button>
+            <button (click)="onSetObjectOnGrid()" type="button" [ngClass]="setObjectOnGrid==false?'btn btn-outline-dark':'btn btn-dark'">Add
+              Object</button>
+            <button type="button" (click)="onDeleteObjectFromGrid()" [ngClass]="deleteObjectFromGrid==false?'btn btn-outline-dark':'btn btn-dark'">Delete
+              Object</button>
             <button class="btn btn-outline-dark" type="button" (click)="onGridEmpty()">Empty Grid</button>
             <button class="btn btn-outline-dark" type="button" (click)="onObjectGridEmpty()">Empty Object on Grid</button>
+            <button [ngClass]="notify==false?'btn btn-outline-dark':'btn btn-dark'" type="button" (click)="notify==true?notify=false:notify=true">Notify
+              Something to the party</button>
+            <input type="text" [hidden]="!notify" (keydown)="onKeydown($event,notification.value)" #notification>
           </div>
+        </div>
+        <div><input type="file" ng2FileSelect [uploader]="uploader"><button (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">Save</button>
         </div>
       </div>
     </div>

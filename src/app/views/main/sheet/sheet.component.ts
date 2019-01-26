@@ -6,6 +6,7 @@ import { PDFDocumentProxy } from 'ng2-pdf-viewer';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { Input } from '../../../class/input';
 import { PDFAnnotationData } from 'pdfjs-dist';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-sheet',
@@ -50,7 +51,7 @@ export class SheetComponent implements OnInit {
     "INTmod",
     "WISmod",
     "CHamod",];
-  constructor(public httpServ: RestServiceService, public shared: SharedVariableService, private _fb: FormBuilder) {
+  constructor(public httpServ: RestServiceService, public shared: SharedVariableService, private _fb: FormBuilder, private toastr:ToastrService) {
     this.character = this.shared.character;
     this.strenghtModifier = Math.floor((this.character.strenght - 10) / 2);
     this.dexterityModifier = Math.floor((this.character.dexterity - 10) / 2);
@@ -62,14 +63,14 @@ export class SheetComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.httpServ.isLoggedIn().subscribe(res => console.log(res));
-    //this.httpServ.campaignChosed().subscribe(res => console.log(res));
+    this.httpServ.isLoggedIn().subscribe(res => console.log(res));
+    this.httpServ.campaignChosed().subscribe(res => console.log(res));
   }
   onChangeAttribute(name: String, value: String) {
     this.httpServ.updatePg(name, value).subscribe();
   }
   onSave() {
-    this.httpServ.multipleUpdateOnPg(this.character).subscribe(res=>{this.shared.character=this.character});
+    this.httpServ.multipleUpdateOnPg(this.character).subscribe(res=>{this.shared.character=this.character,this.toastr.success('Your update was successful')},err=>{this.toastr.error('There was an error while trying to process your request, please try again later')});
   }
   loadComplete(pdf: PDFDocumentProxy): void {
     for (let i = 1; i <= pdf.numPages; i++) {
