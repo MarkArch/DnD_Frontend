@@ -12,9 +12,10 @@ import { st } from '@angular/core/src/render3';
 import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { FileUploader } from 'ng2-file-upload';
+import { timeout } from 'q';
 // import { ChangeDetectorRef } from '@angular/core';
 
-const URL = 'http://localhost:8080/DeDManager/upload';
+const URL = 'http://192.168.1.62:8080/DeDManager/upload';
 
 @Component({
   selector: 'app-grid',
@@ -146,7 +147,10 @@ export class GridComponent implements OnInit, OnDestroy {
   weasdomBuff: number = 0;
   charismatBuff: number = 0;
   notify=false;
+  hideCharacterRows=false;
   uploader:FileUploader = new FileUploader({url: URL});
+  pingTimes=0;
+  pingTimeOut=false;
   public isFriend = [];
   public inModify = [];
   public inGrid = [];
@@ -191,6 +195,7 @@ export class GridComponent implements OnInit, OnDestroy {
   syncroPositions() {
     this.syncroPositionsSubscription = this.service.syncroPositions().subscribe((res: String) => {
       console.log(res);
+      this.possibleMoves=[];
       if (res == 'positions') {
         this.service.getPositions().subscribe((res: grid[]) => {
           this.grid = res; for (let position of this.grid) {
@@ -501,8 +506,10 @@ export class GridComponent implements OnInit, OnDestroy {
       this.service.setObjectOnGrid(this.objectName, x, y).subscribe();
     } else if (this.deleteObjectFromGrid == true) {
       this.service.deleteObjectOnGrid("", x, y).subscribe();
-    } else {
-      this.service.pingGrid(x, y).subscribe();
+    } else if(this.pingTimes<3){
+      this.service.pingGrid(x, y).subscribe(res=>this.pingTimes+=1);
+      if(this.pingTimes==3)
+      setTimeout(()=>{this.pingTimes=0},60000);
     }
   }
 
