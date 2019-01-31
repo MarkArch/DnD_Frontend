@@ -25,12 +25,10 @@ export class SheetComponent implements OnInit {
   readonly dpiRatio = 96 / 72;
   public myForm: FormGroup;
   public inputList: Input[] = [];
+  loadEnded = false;
   validInput: String[] = ["ClassLevel",
-    "Background",
     "PlayerName",
-    "Race ",
     "Alignment",
-    "XP",
     "STR",
     "DEX",
     "CON",
@@ -42,7 +40,7 @@ export class SheetComponent implements OnInit {
     "Speed",
     "HPMax",
     "HPCurrent",
-    "HPTemp", "HD"];
+     "HD"];
   validLabel: String[] = [
     "CharacterName",
     "STRmod",
@@ -51,8 +49,11 @@ export class SheetComponent implements OnInit {
     "INTmod",
     "WISmod",
     "CHamod",];
-  constructor(public httpServ: RestServiceService, public shared: SharedVariableService, private _fb: FormBuilder, private toastr:ToastrService) {
-    this.character = this.shared.character;
+  inputToBeSet: String[] = ["Background", "Race ", "XP","HPTemp",]
+  constructor(public httpServ: RestServiceService, public shared: SharedVariableService, private _fb: FormBuilder, private toastr: ToastrService) {
+    this.httpServ.chooseCharacter("", 0).subscribe(res => {
+      this.shared.character = res; this.character = this.shared.character;
+    });
     this.strenghtModifier = Math.floor((this.character.strenght - 10) / 2);
     this.dexterityModifier = Math.floor((this.character.dexterity - 10) / 2);
     this.constitutionModifier = Math.floor((this.character.constitution - 10) / 2);
@@ -70,9 +71,10 @@ export class SheetComponent implements OnInit {
     this.httpServ.updatePg(name, value).subscribe();
   }
   onSave() {
-    this.httpServ.multipleUpdateOnPg(this.character).subscribe(res=>{this.shared.character=this.character,this.toastr.success('Your update was successful')},err=>{this.toastr.error('There was an error while trying to process your request, please try again later')});
+    this.httpServ.multipleUpdateOnPg(this.character).subscribe(res => { this.shared.character = this.character, this.toastr.success('Your update was successful') }, err => { this.toastr.error('There was an error while trying to process your request, please try again later') });
   }
   loadComplete(pdf: PDFDocumentProxy): void {
+    this.loadEnded = true;
     for (let i = 1; i <= pdf.numPages; i++) {
 
       // track the current page
@@ -146,10 +148,15 @@ export class SheetComponent implements OnInit {
   inputValue(name: String, i: Input) {
     if (name == "CharacterName")
       return this.character.charName
-    else if (name == "ClassLevel")
-      return i.value = this.character.class1;
+    else if (name == "ClassLevel") {
+      if (this.character.level > 0 && this.character.class1 != '') {
+        return i.value = this.character.class1 + " " + this.character.level;
+      } else {
+        return i.value = this.character.class1
+      }
+    }
     else if (name == "PlayerName") return i.value = this.character.ref_username;
-    else if (name == "Race ") return i.value = this.character.class1;
+    // else if (name == "Race ") return i.value = this.character.class1;
     else if (name == "Alignment") return i.value = this.character.alignament;
     //else if( name=="XP") return i.value=this.character.
     else if (name == "STR") return i.value = this.character.strenght;
@@ -177,10 +184,16 @@ export class SheetComponent implements OnInit {
   onChangeAttributeValue(name, value) {
     if (name == "CharacterName")
       this.character.charName = this.myForm.get("CharacterName").value;
-    else if (name == "ClassLevel")
-      this.character.class1 = this.myForm.get("ClassLevel").value;
+    else if (name == "ClassLevel") {
+      if (value.includes(" ")) {
+        this.character.class1 = (this.myForm.get("ClassLevel").value as string).substring(0, (this.myForm.get("ClassLevel").value as string).indexOf(" "));
+        this.character.level = +((this.myForm.get("ClassLevel").value as string).substring((this.myForm.get("ClassLevel").value as String).indexOf(" ") + 1));
+      } else {
+        this.character.class1 = this.myForm.get("ClassLevel").value;
+      }
+    }
     else if (name == "PlayerName") this.character.ref_username = this.myForm.get("PlayerName").value;
-    else if (name == "Race ") this.character.class1 = this.myForm.get("Race").value;
+    //else if (name == "Race ") this.character.class1 = this.myForm.get("Race").value;
     else if (name == "Alignment") this.character.alignament = this.myForm.get("Alignment").value;
     //else if( name=="XP") this.character.
     else if (name == "STR") this.character.strenght = this.myForm.get("STR").value;
@@ -198,5 +211,8 @@ export class SheetComponent implements OnInit {
     else if (name == "HPCurrent") this.character.current_hp = this.myForm.get("HPCurrent").value;
     //else if( name=="HPTemp") this.character.
     else if (name == "HD") this.character.hit_dice = this.myForm.get("HD").value;
-    }
+  }
+  onDiscard(){
+    this.httpServ.chooseCharacter('',0).subscribe(res=>{this.character=res;this.toastr.success('Your character has been restored')})
+  }
 }

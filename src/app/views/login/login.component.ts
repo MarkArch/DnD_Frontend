@@ -30,8 +30,13 @@ export class LoginComponent implements OnInit {
 
   onLogin(username, password) {
     //this.router.navigate(['/campaign']);
-    this.service.login(username, password).subscribe(res => {
+    this.service.login(username, password).subscribe((res:String) => {
+      console.log(res);
+      if(res=='true'){
+        this.router.navigate(['/newCharacter']);
+      }else{
       this.router.navigate(['/campaign']);
+      }
     }, err => {
       this.isLoginFailed=true;
     });

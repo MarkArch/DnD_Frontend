@@ -8,6 +8,7 @@ import { grid } from '../class/grid';
 import { buff } from '../class/buff';
 import { st } from '@angular/core/src/render3';
 import { text } from '@angular/core/src/render3/instructions';
+import { StringifyOptions } from 'querystring';
 
 @Injectable({
   providedIn: 'root'
@@ -18,105 +19,105 @@ export class RestServiceService {
 
   login(username: string, password: string): Observable<any> {
     var user: userlogin = new userlogin(username, password, null);
-    return this.http.post("http://192.168.1.62:8080/DeDManager/login", user, { withCredentials: true });
+    return this.http.post("http://localhost:8080/DeDManager/login", user, {responseType:"text", withCredentials: true });
   }
   isLoggedIn(): Observable<any> {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/validateAuthToken", { withCredentials: true });
+    return this.http.get("http://localhost:8080/DeDManager/validateAuthToken", { withCredentials: true });
   }
   campaignChosed(): Observable<any> {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/validateCharToken", { withCredentials: true });
+    return this.http.get("http://localhost:8080/DeDManager/validateCharToken", { withCredentials: true });
   }
   register(username: string, password: string, email: string): Observable<any> {
-    return this.http.post("http://192.168.1.62:8080/DeDManager/register", new userlogin(username, password, email));
+    return this.http.post("http://localhost:8080/DeDManager/register", new userlogin(username, password, email));
   }
   registerNpc(npc: character): Observable<any> {
-    return this.http.post("http://192.168.1.62:8080/DeDManager/register/pg", npc, { withCredentials: true });
+    return this.http.post("http://localhost:8080/DeDManager/register/pg", npc, { withCredentials: true });
   }
   accounts(): Observable<any> {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/Accounts", { withCredentials: true });
+    return this.http.get("http://localhost:8080/DeDManager/Accounts", { withCredentials: true });
   }
   chooseCharacter(charName: String, session_id: number): Observable<any> {
-    return this.http.post("http://192.168.1.62:8080/DeDManager/choosePg", { "charName": charName, "session_id": session_id }, { withCredentials: true });
+    return this.http.post("http://localhost:8080/DeDManager/choosePg", { "charName": charName, "session_id": session_id }, { withCredentials: true });
   }
   logout() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/logout", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/logout", { withCredentials: true })
   }
   getPositions() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/positions", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/positions", { withCredentials: true })
   }
   getPossibleMoves(speed: String) {
-    return this.http.post("http://192.168.1.62:8080/DeDManager/possibleMoves", speed, { withCredentials: true })
+    return this.http.post("http://localhost:8080/DeDManager/possibleMoves", speed, { withCredentials: true })
   }
   facebookLogin(accessToken: String) {
-    return this.http.post("http://192.168.1.62:8080/DeDManager/facebookLogin", accessToken, { withCredentials: true })
+    return this.http.post("http://localhost:8080/DeDManager/facebookLogin", accessToken, { withCredentials: true })
   }
   getCharacterList() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/characterList", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/characterList", { withCredentials: true })
   }
   getSyncroCharacterList() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/characterList/syncro", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/characterList/syncro", { withCredentials: true })
   }
   getSyncroTurn() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/turn/syncro", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/turn/syncro", { withCredentials: true })
   }
   getNextTurn() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/turn/next", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/turn/next", { withCredentials: true })
   }
   getTurn() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/turn", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/turn", { withCredentials: true })
   }
   updatePg(label: String, value: String) {
-    return this.http.put("http://192.168.1.62:8080/DeDManager/updatePg", label + ":" + value, { withCredentials: true })
+    return this.http.put("http://localhost:8080/DeDManager/updatePg", label + ":" + value, { withCredentials: true })
   }
   movePg(x, y) {
     var g: grid = new grid();
     g.x = x;
     g.y = y;
-    return this.http.put("http://192.168.1.62:8080/DeDManager/movePg", g, { withCredentials: true })
+    return this.http.put("http://localhost:8080/DeDManager/movePg", g, { withCredentials: true })
   }
   syncroPositions() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/positions/syncro", { responseType: 'text', withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/positions/syncro", { responseType: 'text', withCredentials: true })
   }
   syncroDice() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/syncroDice", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/syncroDice", { withCredentials: true })
   }
   throwDice(dice_type: String, dice_value: number) {
-    return this.http.post("http://192.168.1.62:8080/DeDManager/ThrowDice/" + dice_type, dice_value.toString(), { withCredentials: true })
+    return this.http.post("http://localhost:8080/DeDManager/ThrowDice/" + dice_type, dice_value.toString(), { withCredentials: true })
   }
   pingGrid(x: number, y: number) {
     let g: grid = new grid();
     g.x = x;
     g.y = y;
-    return this.http.post("http://192.168.1.62:8080/DeDManager/ping/", g, { withCredentials: true })
+    return this.http.post("http://localhost:8080/DeDManager/ping/", g, { withCredentials: true })
   }
   syncroPing() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/ping/syncro", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/ping/syncro", { withCredentials: true })
   }
   setObjectOnGrid(charname, x, y) {
     let obj: grid = new grid();
     obj.charName = charname;
     obj.x = x;
     obj.y = y;
-    return this.http.post("http://192.168.1.62:8080/DeDManager/gridObject/", obj, { withCredentials: true })
+    return this.http.post("http://localhost:8080/DeDManager/gridObject/", obj, { withCredentials: true })
   }
   deleteObjectOnGrid(charname, x, y) {
     let obj: grid = new grid();
     obj.charName = charname;
     obj.x = x;
     obj.y = y;
-    return this.http.post("http://192.168.1.62:8080/DeDManager/gridObject/delete", obj, { withCredentials: true })
+    return this.http.post("http://localhost:8080/DeDManager/gridObject/delete", obj, { withCredentials: true })
   }
   emptyGrid() {
-    return this.http.delete("http://192.168.1.62:8080/DeDManager/positions/empty", { withCredentials: true });
+    return this.http.delete("http://localhost:8080/DeDManager/positions/empty", { withCredentials: true });
   }
   emptyObjectGrid() {
-    return this.http.delete("http://192.168.1.62:8080/DeDManager/gridObject/empty", { withCredentials: true });
+    return this.http.delete("http://localhost:8080/DeDManager/gridObject/empty", { withCredentials: true });
   }
   getBuff() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/Buff", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/Buff", { withCredentials: true })
   }
   getBuffUpdate() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/Buff/update", { withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/Buff/update", { withCredentials: true })
   }
   postBuff(charName1, charName2, stat, intensity, lastfor, type) {
     let b: buff = new buff();
@@ -126,15 +127,20 @@ export class RestServiceService {
     b.intensity = intensity;
     b.lastFor = lastfor;
     b.type = type;
-    return this.http.post("http://192.168.1.62:8080/DeDManager/Buff", b, { withCredentials: true })
+    return this.http.post("http://localhost:8080/DeDManager/Buff", b, { withCredentials: true })
   }
   multipleUpdateOnPg(pg: character) {
-    return this.http.put("http://192.168.1.62:8080/DeDManager/setPg", pg, { withCredentials: true })
+    return this.http.put("http://localhost:8080/DeDManager/setPg", pg, { withCredentials: true })
   }
   getNotification() {
-    return this.http.get("http://192.168.1.62:8080/DeDManager/Notificate", { responseType: 'text', withCredentials: true })
+    return this.http.get("http://localhost:8080/DeDManager/Notificate", { responseType: 'text', withCredentials: true })
   }
   postNotification(notification: String) {
-    return this.http.post("http://192.168.1.62:8080/DeDManager/Notificate", notification, { withCredentials: true })
+    return this.http.post("http://localhost:8080/DeDManager/Notificate", notification, { withCredentials: true })
+  }
+  getImage(username,charName,sessionId):number{
+    let status=0;
+    this.http.get('/assets/img/'+username+'_'+charName+'_'+sessionId+'.PNG',{responseType:'blob'}).subscribe((res:any)=>status=res.status,(err:any)=>status=err.satus);
+    return status;
   }
 }

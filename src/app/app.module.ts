@@ -59,6 +59,7 @@ import { FacebookModule } from 'ngx-facebook';
 import { PdfViewerModule} from 'ng2-pdf-viewer'
 import { ToastrModule } from 'ngx-toastr';
 import { FileSelectDirective } from 'ng2-file-upload';
+import { NewCharacterComponent } from './views/new-character/new-character.component';
 export function getAuthServiceConfigs() {
   let config = new AuthServiceConfig(
       [
@@ -104,7 +105,8 @@ export function getAuthServiceConfigs() {
     P500Component,
     LoginComponent,
     RegisterComponent,
-    CampaignSelectComponent
+    CampaignSelectComponent,
+    NewCharacterComponent
   ],
   providers: [{
     provide: LocationStrategy,

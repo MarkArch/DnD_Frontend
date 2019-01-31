@@ -11,6 +11,7 @@ import { RegisterComponent } from './views/register/register.component';
 import { GridComponent } from './views/main/grid/grid.component';
 import { HomeComponent } from './views/main/home/home.component';
 import { CampaignSelectComponent } from './views/campaign-select/campaign-select.component';
+import { NewCharacterComponent } from './views/new-character/new-character.component';
 
 export const routes: Routes = [
   {
@@ -45,6 +46,12 @@ export const routes: Routes = [
     data: {
       title: 'Campaign page'
     }
+  }, 
+  { path: 'newCharacter', 
+    component: NewCharacterComponent, 
+    data: { 
+      title: 'Character name' 
+    } 
   },
   {
     path: '',
