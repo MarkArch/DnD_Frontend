@@ -1,5 +1,5 @@
 export class grid{
-    charName:String;
+    charName:String='';
     x:number;
     y:number;
 }

@@ -5,8 +5,9 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RestServiceService } from '../../../shared/rest-service.service';
 import { postlogin } from '../../../class/postlogin';
 import { FileUploader } from 'ng2-file-upload';
+import { userlogin } from '../../../class/userlogin';
 
-const URL = 'http://localhost:8080/DeDManager/upload';
+const URL = 'http://93.55.227.222:9001/DeDManager/upload';
 
 @Component({
     selector: 'app-home',
@@ -19,17 +20,16 @@ export class HomeComponent {
 
         this.rest.chooseCharacter('', 0).subscribe(res => {
             this.shared.character = res; console.log(res);
-            
-            this.map='/assets/img/map'+this.shared.character.session_id+".jpg";
-            if(this.rest.getImage(this.shared.character.ref_username,this.shared.character.charName,this.shared.character.session_id)<400){
-                this.image ='/assets/img/'+this.shared.character.ref_username+'_'+this.shared.character.charName+'_'+this.shared.character.session_id+".PNG";
-            }else{
-                this.image='/assets/img/no_img.PNG'
-            }
+
+            this.map = '/assets/img/map' + this.shared.character.session_id + ".jpg";
+            this.rest.getImage(this.shared.character.ref_username, this.shared.character.charName, this.shared.character.session_id).subscribe((res: any) =>
+                this.image = '/assets/img/' + this.shared.character.ref_username + '_' + this.shared.character.charName + '_' + this.shared.character.session_id + ".PNG",
+                (err: any) => this.image = '/assets/img/no_img.PNG');
             this.rest.accounts().subscribe((res: postlogin[]) => {
                 res.forEach(r => { if (r.session_id == this.shared.character.session_id) { this.sessionName = r.session_name } });
                 this.rest.getCharacterList().subscribe(res => { this.characterList = res });
             });
+            this.rest.getUsersList().subscribe((res: String[]) => this.usersList = res);
         })
 
     }
@@ -40,4 +40,22 @@ export class HomeComponent {
     characterList: any;
     largeImage = false;
     uploader: FileUploader = new FileUploader({ url: URL });
+    usersList: String[] = [];
+    searchedUsers: String[] = [''];
+    onSearch(value) {
+        this.searchedUsers = [''];
+        if (value != '') {  
+            this.searchedUsers = [];          
+            this.usersList.forEach(user => {
+                if (user.toLowerCase().includes(value.toLowerCase())) {
+                    this.searchedUsers.push(user)
+                }
+            });
+            console.log(this.searchedUsers)
+        }
+    }
+    onCharacterInvite(username){
+        let a :userlogin[]=[new userlogin(username,'','')];
+        this.rest.invitePLayer(a).subscribe(res=>console.log(res));
+    }
 }

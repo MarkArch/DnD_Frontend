@@ -2,15 +2,18 @@
     <div class="card-body">
         <div class="row">
             <div [ngClass]="largeImage==false?'col-8':'col-12'">
-                <h1 class="text-center">{{sessionName}}</h1><img [src]="map" class="img-fluid p-2" [ngStyle]="{'width':largeImage==true?'100%':'','cursor':largeImage==true?'zoom-out':'zoom-in'}"
+                <h1 class="text-center">{{sessionName}}</h1><img [src]="map" class="img-fluid p-2"
+                    [ngStyle]="{'width':largeImage==true?'100%':'','cursor':largeImage==true?'zoom-out':'zoom-in'}"
                     (click)="largeImage==true?largeImage=false:largeImage=true">
             </div>
             <div class="col-4" *ngIf="largeImage==false">
                 <div style="width:100%;padding-top: 100%;position: relative;">
-                    <label for='file-input' style="position: absolute;top:0;left: 0;width: 100%;height: 100%;padding: 15%"><img
-                            [src]="image" class="img-fluid rounded-circle" style="height: 100%;cursor: pointer;"></label><input
-                        id='file-input' type="file" ng2FileSelect [uploader]="uploader" hidden> 
-                        <ng-container *ngIf='uploader.getNotUploadedItems().length'>{{uploader.uploadAll()}}</ng-container>
+                    <label for='file-input'
+                        style="position: absolute;top:0;left: 0;width: 100%;height: 100%;padding: 15%"><img
+                            [src]="image" class="img-fluid rounded-circle"
+                            style="height: 100%;cursor: pointer;"></label><input id='file-input' type="file"
+                        ng2FileSelect [uploader]="uploader" hidden>
+                    <ng-container *ngIf='uploader.getNotUploadedItems().length'>{{uploader.uploadAll()}}</ng-container>
                 </div>
                 <div class="col-8 float-left">
                     <h6>Character: {{shared.character.charName}}</h6>
@@ -28,8 +31,15 @@
         </div>
         <div class="row mt-2">
             <ng-container *ngFor="let player of characterList">
-                <div class="col-3" *ngIf="player.privilege=='user'"><label>{{player.charName}} [ {{player.class1}} ]</label></div>
+                <div class="col-3" *ngIf="player.privilege=='user'"><label>{{player.charName}} [ {{player.class1}}
+                        ]</label></div>
             </ng-container>
+        </div><div class="row mt-4">
+            <div *ngIf="this.shared.character.privilege=='master'" class="col-3">
+                <input type="text" class="form-control ds-input" placeholder="invite player" value=""
+                    [ngModel]="onSearch(search.value)" #search>
+
+            </div>
+            <div style="height: 150px;overflow: auto" *ngIf="searchedUsers.length>0" class="col-3"><table style="width: 100%"><tr *ngFor="let u of searchedUsers"><td (click)="onCharacterInvite(u)" style="width: 100%" colspan="2" ><label class="btn btn-outline-primary" *ngIf="u!=''" style="width: 100%">{{u}}</label></td></tr></table></div>
         </div>
     </div>
-</div>

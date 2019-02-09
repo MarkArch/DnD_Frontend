@@ -13,6 +13,8 @@ import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { FileUploader } from 'ng2-file-upload';
 import { timeout } from 'q';
+import { postlogin } from '../../../class/postlogin';
+import { sessionEnum } from '../../../class/sessionEnum';
 // import { ChangeDetectorRef } from '@angular/core';
 
 const URL = 'http://192.168.1.62:8080/DeDManager/upload';
@@ -59,8 +61,19 @@ export class GridComponent implements OnInit, OnDestroy {
 
   constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService, private shareVariable: SharedVariableService, private toastr: ToastrService) {
     this.service.chooseCharacter("", 0).subscribe(res => {
+      this.service.accounts().subscribe((res: postlogin[]) => {
+        this.accounts = res;console.log(this.accounts)
+      });
       this.shared.character = res; this.character = this.shared.character;
-      console.log(this.character)
+      console.log(this.character);
+      this.service.getPossibleViews("12").subscribe((res: grid[]) => {
+        console.log("possible views", res),
+          this.possibleViews = res;
+        this.minX = this.possibleViews[0].x;
+        this.minY = this.possibleViews[0].y;
+        this.maxX = this.possibleViews[3].x;
+        this.maxY = this.possibleViews[3].y;
+      });
       this.x = +this.character.grid_dimension.substring(0, this.character.grid_dimension.indexOf(','));
       this.y = +this.character.grid_dimension.substring(this.character.grid_dimension.indexOf(',') + 1);
       this.onGridInit();
@@ -79,7 +92,19 @@ export class GridComponent implements OnInit, OnDestroy {
         console.log(res);
         this.sessionPlayers = res;
         this.sessionPlayers.forEach(p => {
-          this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
+          let healthStatus='';
+          if((p.current_hp / p.hp)>0.80){
+            healthStatus='Healthy'
+          }else if((p.current_hp / p.hp)>0.50){
+            healthStatus='Quite healthy'
+          }else if((p.current_hp / p.hp)>0.25){
+            healthStatus='Damaged'
+          }else if((p.current_hp / p.hp)>0){
+            healthStatus='Really Damaged'
+          }else{
+            healthStatus='To the ground'
+          };
+          this.tooltip.push("Current HP: " + healthStatus);
           this.inModify.push(false);
           this.inGrid.push(false);
           this.isFriend.push(false);
@@ -126,6 +151,9 @@ export class GridComponent implements OnInit, OnDestroy {
 
   }
   public diceThrow;
+  public accounts: postlogin[] = [];
+  public currentAccount: postlogin[] = [];
+  public sessions: sessionEnum[] = [];
   settingOnGrid = false;
   isMasterSession = false;
   turn: number = 0;
@@ -133,6 +161,7 @@ export class GridComponent implements OnInit, OnDestroy {
   character: character;
   grid: grid[] = [];
   possibleMoves: grid[] = [];
+  possibleViews: grid[] = [];
   charecterPosition: grid = new grid();
   ping: grid = { charName: "", x: 99, y: 99 };
   setObjectOnGrid = false;
@@ -155,6 +184,10 @@ export class GridComponent implements OnInit, OnDestroy {
   uploader: FileUploader = new FileUploader({ url: URL });
   pingTimes = 0;
   pingTimeOut = false;
+  minX = 0;
+  maxX = 0;
+  minY = 0;
+  maxY = 0;
   public isFriend = [];
   public inModify = [];
   public inGrid = [];
@@ -206,6 +239,14 @@ export class GridComponent implements OnInit, OnDestroy {
               this.charecterPosition.y = position.y;
             }
           }
+          this.service.getPossibleViews("12").subscribe((res: grid[]) => {
+            console.log("possible views", res),
+              this.possibleViews = res;
+            this.minX = this.possibleViews[0].x;
+            this.minY = this.possibleViews[0].y;
+            this.maxX = this.possibleViews[3].x;
+            this.maxY = this.possibleViews[3].y;
+          });
           this.syncroPositions();
         });
       } else if (res == 'notification') {
@@ -218,31 +259,42 @@ export class GridComponent implements OnInit, OnDestroy {
   }
   searchCharacterOnGrid(x, y): String {
     let a = "";
-    this.grid.forEach(char => {
-      if (char.x == x && char.y == y) {
-        if (char.charName == "tree") {
-          return a = "tree";
-        } else if (char.charName == "horizontal wall") {
-          return a = "grip-lines";
-        } else if (char.charName == "vertical wall") {
-          return a = "grip-lines-vertical"
-        } else {
-          for (let i in this.sessionPlayers) {
-            if (this.sessionPlayers[i].charName == char.charName) {
-              a = this.sessionPlayers[i].gridNumber;
-              if (this.sessionPlayers[i].privilege == 'user') {
-                this.isFriend[i] = true;
+      this.grid.forEach(char => {
+        if (char.x == x && char.y == y) {
+          if (char.charName == "tree") {
+            return a = "tree";
+          } else if (char.charName == "horizontal wall") {
+            return a = "grip-lines";
+          } else if (char.charName == "vertical wall") {
+            return a = "grip-lines-vertical"
+          } else if (char.charName == "dungeon") {
+            return a = "dungeon";
+          } else if (char.charName == "door-closed") {
+            return a = "door-closed"
+          } else {
+            for (let i in this.sessionPlayers) {
+              if (this.sessionPlayers[i].charName == char.charName) {
+                a = this.sessionPlayers[i].gridNumber;
+                if (this.sessionPlayers[i].privilege == 'user') {
+                  this.isFriend[i] = true;
+                }
               }
             }
           }
         }
-      }
-    });
-    this.possibleMoves.forEach(char => {
-      if (char.x == x && char.y == y) {
-        a = "P";
-      }
-    });
+      });
+
+      this.possibleMoves.forEach(char => {
+        if (char.x == x && char.y == y) {
+          a = "P";
+        }
+      });
+      if (this.minX <= x && x <= this.maxX && this.minY <= y && y <= this.maxY) {
+          }else{
+            if(this.character.privilege=='user'){
+              a="";
+            }
+          }
     return a;
   }
 
@@ -250,7 +302,7 @@ export class GridComponent implements OnInit, OnDestroy {
     let a = false;
     this.grid.forEach(char => {
       if (char.x == x && char.y == y) {
-        if (char.charName == 'tree' || char.charName == 'horizontal wall' || char.charName == 'vertical wall') {
+        if (char.charName == 'tree' || char.charName == 'horizontal wall' || char.charName == 'vertical wall' || char.charName == 'door-closed' || char.charName == 'dungeon') {
           return a = true;
         }
         for (let i in this.sessionPlayers) {
@@ -267,10 +319,25 @@ export class GridComponent implements OnInit, OnDestroy {
   }
   syncroCharacter() {
     this.syncroCharacterSubscription = this.service.getSyncroCharacterList().subscribe(res => {
+      this.service.accounts().subscribe((res: postlogin[]) => {
+        this.accounts = res;
+      });
       this.sessionPlayers = res;
       this.tooltip = [];
       this.sessionPlayers.forEach(p => {
-        this.tooltip.push("Current HP " + (p.current_hp / p.hp * 100).toFixed(2) + "%");
+        let healthStatus='';
+          if((p.current_hp / p.hp)>0.80){
+            healthStatus='Healthy'
+          }else if((p.current_hp / p.hp)>0.50){
+            healthStatus='Quite healthy'
+          }else if((p.current_hp / p.hp)>0.25){
+            healthStatus='Damaged'
+          }else if((p.current_hp / p.hp)>0){
+            healthStatus='Really Damaged'
+          }else{
+            healthStatus='To the ground'
+          };
+          this.tooltip.push("Current HP: " + healthStatus);
         this.inModify.push(false);
       })
       this.service.getBuff().subscribe((res: buff[]) => {
@@ -508,7 +575,7 @@ export class GridComponent implements OnInit, OnDestroy {
     } else if (this.deleteObjectFromGrid == true) {
       this.service.deleteObjectOnGrid("", x, y).subscribe();
     } else if (this.pingTimes < 3) {
-      this.service.pingGrid(x, y).subscribe(res => this.pingTimes += 1);
+      this.service.pingGrid(x, y).subscribe(res => {if(this.character.privilege=='user')this.pingTimes += 1});
       if (this.pingTimes == 3)
         setTimeout(() => { this.pingTimes = 0 }, 60000);
     }
@@ -558,8 +625,8 @@ export class GridComponent implements OnInit, OnDestroy {
   }
 
   onChangeChar(i) {
-    if (this.character.privilege == 'master' && this.sessionPlayers[i].privilege == 'master') {
-      this.service.chooseCharacter(this.sessionPlayers[i].charName, this.sessionPlayers[i].session_id).subscribe(res => {
+    if (this.character.privilege == 'master' && this.accounts[i]!= null) {
+      this.service.chooseCharacter(this.accounts[i].charName, this.accounts[i].session_id).subscribe(res => {
         this.character = res;
         this.statInitializer();
         this.service.getPositions().subscribe((res: grid[]) => {
@@ -644,5 +711,9 @@ export class GridComponent implements OnInit, OnDestroy {
   }
   saveFile(file) {
     console.log(file.value);
+  }
+  onDeleteChar(charName){
+    if(this.character.charName==charName)
+    this.service.updatePg('alive','0').subscribe(res=>{this.toastr.success('Character has been removed with success')});
   }
 }

@@ -9,44 +9,56 @@
   </div>
   <div class="card-body">
     <div style="width: 100%">
-        <div class="input-group mb-3" *ngIf="this.character.privilege=='master'">
-          <div class="input-group">
-            <ng-container style="width: 30%" *ngIf="setObjectOnGrid==true">
-              <select #object class="custom-select" (click)="objectName=object.value">
-                <option>tree</option>
-                <option>horizontal wall</option>
-                <option>vertical wall</option>
-              </select>
-            </ng-container>
-            <div class="input-group-append">
-              <button (click)="onSetObjectOnGrid()" type="button" [ngClass]="setObjectOnGrid==false?'btn btn-outline-dark':'btn btn-dark'">Add
-                Object</button>
-              <button type="button" (click)="onDeleteObjectFromGrid()" [ngClass]="deleteObjectFromGrid==false?'btn btn-outline-dark':'btn btn-dark'">Delete
-                Object</button>
-              <button class="btn btn-outline-dark" type="button" (click)="onGridEmpty()">Empty Grid</button>
-              <button class="btn btn-outline-dark" type="button" (click)="onObjectGridEmpty()">Empty Object on Grid</button>
-              <button [ngClass]="notify==false?'btn btn-outline-dark':'btn btn-dark'" type="button" (click)="notify==true?notify=false:notify=true">Notify
-                Something to the party</button>
-              <input type="text" [hidden]="!notify" (keydown)="onKeydown($event,notification.value)" #notification>
-            </div>
-          </div>
-          <div><input type="file" ng2FileSelect [uploader]="uploader"><button (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">Save</button>
+      <div class="input-group mb-3" *ngIf="this.character.privilege=='master'">
+        <div class="input-group" style="width: 50%">
+          <ng-container *ngIf="setObjectOnGrid==true">
+            <select #object class="custom-select" (click)="objectName=object.value">
+              <option>tree</option>
+              <option>horizontal wall</option>
+              <option>vertical wall</option>
+              <option>door-closed</option>
+              <option>dungeon</option>
+            </select>
+          </ng-container>
+          <div class="input-group-append">
+            <button (click)="onSetObjectOnGrid()" type="button"
+              [ngClass]="setObjectOnGrid==false?'btn btn-outline-dark':'btn btn-dark'">Add
+              Object</button>
+            <button type="button" (click)="onDeleteObjectFromGrid()"
+              [ngClass]="deleteObjectFromGrid==false?'btn btn-outline-dark':'btn btn-dark'">Delete
+              Object</button>
+            <button class="btn btn-outline-dark" type="button" (click)="onGridEmpty()">Empty Grid</button>
+            <button class="btn btn-outline-dark" type="button" (click)="onObjectGridEmpty()">Empty Object on
+              Grid</button>
+            <button [ngClass]="notify==false?'btn btn-outline-dark':'btn btn-dark'" type="button"
+              (click)="notify==true?notify=false:notify=true">Notify
+              Something to the party</button>
+            <input type="text" [hidden]="!notify" (keydown)="onKeydown($event,notification.value)" #notification>
           </div>
         </div>
+        <!-- <div><input type="file" ng2FileSelect [uploader]="uploader"><button (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">Save</button> 
+          </div> -->
+      </div>
     </div>
     <div class="col-md-8 col-lg-8 float-left over">
       <div [hidden]="!gridSettingVisible" class="card p-2">
-        <h5>Set squares number: <input class="HPdim" type="number" [(ngModel)]="x" value="x" (ngModelChange)="this.onChangeAttribute('grid_dimension',x+','+y)">
+        <h5>Set squares number: <input class="HPdim" type="number" [(ngModel)]="x" value="x"
+            (ngModelChange)="this.onChangeAttribute('grid_dimension',x+','+y)">
           X
-          <input class="HPdim" type="number" [(ngModel)]="y" value="y" (ngModelChange)="this.onChangeAttribute('grid_dimension',x+','+y)">
+          <input class="HPdim" type="number" [(ngModel)]="y" value="y"
+            (ngModelChange)="this.onChangeAttribute('grid_dimension',x+','+y)">
           <span class="float-right">Set squares dimension:
-            <input type="range" min="1" max="4" class="slider" [(ngModel)]="this.character.grid_zoom" value="this.character.grid_zoom" (ngModelChange)="this.onChangeAttribute('grid_zoom',this.character.grid_zoom)"></span></h5>
+            <input type="range" min="1" max="4" class="slider" [(ngModel)]="this.character.grid_zoom"
+              value="this.character.grid_zoom"
+              (ngModelChange)="this.onChangeAttribute('grid_zoom',this.character.grid_zoom)"></span></h5>
       </div>
       <table class="border separate">
         <tr [@gridAnimation]="this.character.grid_zoom" class="grid border" *ngFor="let row of yAxis; let y = index">
-          <td [@gridAnimation]="this.character.grid_zoom" #cell class="grid border" *ngFor="let col of xAxis; let x = index"
-            (click)="onGridClick(x,y,cell)" [ngStyle]="{'background-color': x==ping.x && y==ping.y?'lightblue':searchCharacterOnGrid(x,y)=='P'?'silver':'white', color: transparent}">
-            <i class="fas fa-{{searchCharacterOnGrid(x,y)}} fa-2x" [ngStyle]="{'color': onCheckFriend(x, y) ? 'blue':'red'}"></i>
+          <td [@gridAnimation]="this.character.grid_zoom" #cell class="grid border"
+            *ngFor="let col of xAxis; let x = index" (click)="onGridClick(x,y,cell)"
+            [ngStyle]="{'background-color': x==ping.x && y==ping.y?'lightblue':searchCharacterOnGrid(x,y)=='P'?'silver':'white', color: transparent}">
+            <i class="fas fa-{{searchCharacterOnGrid(x,y)}} fa-2x"
+              [ngStyle]="{'color': onCheckFriend(x, y) ? 'blue':'red'}"></i>
           </td>
         </tr>
       </table>
@@ -81,7 +93,8 @@
                         value="{{val.tempValue}}" (change)="onTempModify(i)"></td>
                     <td class="text-center">{{val.buffModifier > 0 ? "+" : ""}}{{val.buffModifier}}</td>
                     <td class="text-center">{{val.totValue > 0 ? "+" : ""}}{{val.totValue}}</td>
-                    <td class="text-center right-radius"><i *ngIf="val.savingThrow==1" class="fas fa-star" style="color:  gold"></i>
+                    <td class="text-center right-radius"><i *ngIf="val.savingThrow==1" class="fas fa-star"
+                        style="color:  gold"></i>
                       <i *ngIf="val.savingThrow==0" class="far fa-star" style="color: rgb(199, 197, 197)"></i></td>
                   </tr>
 
@@ -90,7 +103,8 @@
             </div>
             <div class="text-center highFont newLine2">
               <p class="pt-3 font-weight-bold mb-2">Current HP</p>
-              <p><input class="HPdim" type="number" [(ngModel)]="character.current_hp" style="direction: rtl" (change)="onChangeAttribute('current_hp',character.current_hp)">
+              <p><input class="HPdim" type="number" [(ngModel)]="character.current_hp" style="direction: rtl"
+                  (change)="onChangeAttribute('current_hp',character.current_hp)">
                 / {{character.hp}}</p>
               <p class="pt-2 font-weight-bold mb-2">Current MP</p>
               <p><input class="HPdim" type="number" [(ngModel)]="character.current_mana" style="direction: rtl"
@@ -129,32 +143,37 @@
             <h4>Characters List</h4>
             <table class=" m-2 p1 maxWidth">
               <tr>
-                <td colspan="7" class="pb-2"><button (click)="character.show_all==true?onChangeAttribute('show_all',0):onChangeAttribute('show_all',1)"
+                <td colspan="7" class="pb-2"><button
+                    (click)="character.show_all==true?onChangeAttribute('show_all',0):onChangeAttribute('show_all',1)"
                     class="btn btn-outline-primary btn-block">Hide/Show full character list</button></td>
               </tr>
               <tr *ngFor="let pg of sessionPlayers; let ind=index">
                 <ng-container *ngIf="this.character.show_all==false">
                   <td class="pr-2 pl-2 pb-1 text-center"><i *ngIf="ind==turn" class="fas fa-caret-right"></i></td>
                   <td class="pr-2 pl-2 pb-1 text-center highFont"><span [tooltip]="tooltip[ind]" triggers="click"
-                      (click)="onChangeChar(ind)">{{pg.charName}}</span></td>
+                      (click)="onChangeChar(ind)" [ngStyle]="{'color':pg.current_hp/pg.hp>0.15?'black':'red'}">{{pg.charName}}</span></td>
                   <td [hidden]="inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">{{pg.initiative}}</td>
                   <td [hidden]="!inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">
-                    <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="pg.initiative" value="{{pg.initiative}}">
+                    <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="pg.initiative"
+                      value="{{pg.initiative}}">
                   </td>
                   <td [hidden]="inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">Grid: {{pg.gridNumber}}</td>
                   <td [hidden]="!inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">
-                    <input class="HPdim" type="text" style="direction: rtl" [(ngModel)]="pg.gridNumber" value="{{pg.gridNumber}}">
+                    <input class="HPdim" type="text" style="direction: rtl" [(ngModel)]="pg.gridNumber"
+                      value="{{pg.gridNumber}}">
                   </td>
-                  <td class="pr-2 pl-2 pb-1 text-center"><button [hidden]="inModify[ind]" class="btn btn-block btn-sm btn-outline-primary"
-                      type="button" (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
-                    <button [hidden]="!inModify[ind]" class="btn btn-block btn-sm btn-outline-success save-btn" type="button"
-                      (click)="onSaveInitiative(ind)"><i class="fas fa-save save-icon"></i></button></td>
-                  <td class="pr-2 pl-2 pb-2 text-center"><button [hidden]="inGrid[ind]" class="btn btn-block btn-sm btn-outline-primary"
-                      (click)="onArrange(ind, pg.charName)" type="button"><i class="fas fa-th"></i></button>
-                    <button [hidden]="!inGrid[ind]" class="btn btn-block btn-sm btn-outline-success save-btn" type="button"><i
-                        class="fas fa-save save-icon"></i></button></td>
-                  <td class="pr-2 pl-2 pb-2 text-center"><button class="btn btn-block btn-sm btn-outline-danger" type="button"><i
-                        class="fas fa-trash-alt"></i></button></td>
+                  <td class="pr-2 pl-2 pb-1 text-center"><button [hidden]="inModify[ind]"
+                      class="btn btn-block btn-sm btn-outline-primary" type="button"
+                      (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
+                    <button [hidden]="!inModify[ind]" class="btn btn-block btn-sm btn-outline-success save-btn"
+                      type="button" (click)="onSaveInitiative(ind)"><i class="fas fa-save save-icon"></i></button></td>
+                  <td class="pr-2 pl-2 pb-2 text-center"><button [hidden]="inGrid[ind]"
+                      class="btn btn-block btn-sm btn-outline-primary" (click)="onArrange(ind, pg.charName)"
+                      type="button"><i class="fas fa-th"></i></button>
+                    <button [hidden]="!inGrid[ind]" class="btn btn-block btn-sm btn-outline-success save-btn"
+                      type="button"><i class="fas fa-save save-icon"></i></button></td>
+                  <td class="pr-2 pl-2 pb-2 text-center"><button class="btn btn-block btn-sm btn-outline-danger"
+                      type="button" (click)="onDeleteChar(pg.charName)"><i class="fas fa-trash-alt"></i></button></td>
                 </ng-container>
                 <ng-container *ngIf="this.character.show_all==true && ind>=turn-2 && ind<=turn+2">
                   <td class="pr-2 pl-2 pb-1 text-center"><i *ngIf="ind==turn" class="fas fa-caret-right"></i></td>
@@ -162,46 +181,36 @@
                       (click)="onChangeChar(ind)">{{pg.charName}}</span></td>
                   <td [hidden]="inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">{{pg.initiative}}</td>
                   <td [hidden]="!inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">
-                    <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="pg.initiative" value="{{pg.initiative}}">
+                    <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="pg.initiative"
+                      value="{{pg.initiative}}">
                   </td>
                   <td [hidden]="inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">Grid: {{pg.gridNumber}}</td>
                   <td [hidden]="!inModify[ind]" class="pr-2 pl-2 pb-1 text-center highFont">
-                    <input class="HPdim" type="text" style="direction: rtl" [(ngModel)]="pg.gridNumber" value="{{pg.gridNumber}}">
+                    <input class="HPdim" type="text" style="direction: rtl" [(ngModel)]="pg.gridNumber"
+                      value="{{pg.gridNumber}}">
                   </td>
-                  <td class="pr-2 pl-2 pb-1 text-center"><button [hidden]="inModify[ind]" class="btn btn-block btn-sm btn-outline-primary"
-                      type="button" (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
-                    <button [hidden]="!inModify[ind]" class="btn btn-block btn-sm btn-outline-success save-btn" type="button"
-                      (click)="onSaveInitiative(ind)"><i class="fas fa-save save-icon"></i></button></td>
-                  <td class="pr-2 pl-2 pb-2 text-center"><button [hidden]="inGrid[ind]" class="btn btn-block btn-sm btn-outline-primary"
-                      (click)="onArrange(ind, pg.charName)" type="button"><i class="fas fa-th"></i></button>
-                    <button [hidden]="!inGrid[ind]" class="btn btn-block btn-sm btn-outline-success save-btn" type="button"><i
-                        class="fas fa-save save-icon"></i></button></td>
-                  <td class="pr-2 pl-2 pb-2 text-center"><button class="btn btn-block btn-sm btn-outline-danger" type="button"><i
-                        class="fas fa-trash-alt"></i></button></td>
+                  <td class="pr-2 pl-2 pb-1 text-center"><button [hidden]="inModify[ind]"
+                      class="btn btn-block btn-sm btn-outline-primary" type="button"
+                      (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
+                    <button [hidden]="!inModify[ind]" class="btn btn-block btn-sm btn-outline-success save-btn"
+                      type="button" (click)="onSaveInitiative(ind)"><i class="fas fa-save save-icon"></i></button></td>
+                  <td class="pr-2 pl-2 pb-2 text-center"><button [hidden]="inGrid[ind]"
+                      class="btn btn-block btn-sm btn-outline-primary" (click)="onArrange(ind, pg.charName)"
+                      type="button"><i class="fas fa-th"></i></button>
+                    <button [hidden]="!inGrid[ind]" class="btn btn-block btn-sm btn-outline-success save-btn"
+                      type="button"><i class="fas fa-save save-icon"></i></button></td>
+                  <td class="pr-2 pl-2 pb-2 text-center"><button class="btn btn-block btn-sm btn-outline-danger"
+                      type="button" (click)="onDeleteChar(pg.charName)"><i class="fas fa-trash-alt"></i></button></td>
                 </ng-container>
               </tr>
             </table>
             <div class="row pb-4">
               <div class="col-md-6 col-lg-6">
-                <button class="btn btn-block btn-ghost-submit active" type="button" (click)="onNextTurn()">Next turn</button>
+                <button class="btn btn-block btn-ghost-submit active" type="button" (click)="onNextTurn()">Next
+                  turn</button>
               </div>
               <div class="col-md-6 col-lg-6">
                 <button class="btn btn-block btn-ghost-warning active" type="button">Go back</button>
-              </div>
-            </div>
-            <div [hidden]="character.privilege=='user'" class="row">
-              <div class="col-md-5 col-lg-5 pr-1">
-                <input type="text" class="form-control" placeholder="Add a character" #newCharName>
-              </div>
-              <div class="col-md-2 col-lg-2 pl-1 pr-1">
-                <input type="number" class="form-control" placeholder="Init" #newInit>
-              </div>
-              <div class="col-md-2 col-lg-2 pl-1 pr-1">
-                <input type="text" class="form-control" placeholder="Grid" #newGridNum>
-              </div>
-              <div class="col-md-3 col-lg-3">
-                <button class="btn btn-block btn-ghost-success active" (click)="onAddNpc(newCharName.value, newInit.value, newGridNum.value)"
-                  type="button">Add</button>
               </div>
             </div>
           </div>
@@ -210,13 +219,16 @@
           <ng-template tabHeading><i></i>Note/Dices</ng-template>
           <div class="text-center">
             <h4><i class="fas fa-edit pb-3"></i> Write your notes</h4>
-            <textarea class="form-control" cols="30" rows="10" [(ngModel)]="character.note" placeholder="Insert your notes here">{{character.note}}</textarea>
+            <textarea class="form-control" cols="30" rows="10" [(ngModel)]="character.note"
+              placeholder="Insert your notes here">{{character.note}}</textarea>
             <div class="row pb-3 pt-3">
               <div class="col-md-6 col-lg-6">
-                <button class="btn btn-block btn-ghost-success active" type="button" (click)="onChangeAttribute('note',character.note)">Save</button>
+                <button class="btn btn-block btn-ghost-success active" type="button"
+                  (click)="onChangeAttribute('note',character.note)">Save</button>
               </div>
               <div class="col-md-6 col-lg-6">
-                <button class="btn btn-block btn-ghost-danger active" type="button" (click)="onResetNote()">Reset</button>
+                <button class="btn btn-block btn-ghost-danger active" type="button"
+                  (click)="onResetNote()">Reset</button>
               </div>
             </div>
             <hr>
@@ -228,8 +240,10 @@
                   <td>{{icon.type}}</td>
                   <td>X <input class="HPdim" type="number" [(ngModel)]="icon.number" value="icon.number"></td>
                   <td class="pr-3"> = {{icon.value}} </td>
-                  <td><button class="btn btn-block btn-sm btn-outline-primary" type="button" (click)="onDiceThrow(i)">Throw</button></td>
-                  <td><button class="btn btn-block btn-sm btn-outline-danger" type="button" (click)="onDiceReset(i)">Reset</button></td>
+                  <td><button class="btn btn-block btn-sm btn-outline-primary" type="button"
+                      (click)="onDiceThrow(i)">Throw</button></td>
+                  <td><button class="btn btn-block btn-sm btn-outline-danger" type="button"
+                      (click)="onDiceReset(i)">Reset</button></td>
                 </tr>
               </tbody>
             </table>
@@ -242,7 +256,7 @@
               <th>Who</th>
               <td><select class="custom-select" #charNameTo>
                   <ng-container *ngFor="let char of sessionPlayers; let indice=index">
-                    <option *ngIf="char.current_hp>0">{{char.charName}}</option>
+                    <option>{{char.charName}}</option>
                   </ng-container>
                 </select></td>
             </tr>
@@ -278,7 +292,9 @@
                 </select></td>
             </tr>
             <tr>
-              <td colspan=2 style="text-align: center"><button class="btn btn-success" style="width: 50%" (click)="onSetBuff(charNameTo.value,stat.value,intensity.value,lastFor.value,type.value)">Buff</button></td>
+              <td colspan=2 style="text-align: center"><button class="btn btn-success" style="width: 50%"
+                  (click)="onSetBuff(charNameTo.value,stat.value,intensity.value,lastFor.value,type.value)">Buff</button>
+              </td>
             </tr>
           </table>
           <div class="text-center" style="width: 100%;">
@@ -320,6 +336,58 @@
             </table>
           </div>
         </tab>
+        <tab *ngIf="this.character.privilege=='master'">
+          <ng-template tabHeading><i></i>Your Characters</ng-template>
+          <div class="row">
+          <table class=" m-2 p1 maxWidth">
+            <tr *ngFor="let pg of accounts; let ind=index">
+              <ng-container *ngIf="pg.session_id==this.character.session_id">
+                <td class="pr-2 pl-2 pb-1 text-center highFont"><span triggers="click"
+                    (click)="onChangeChar(ind)">{{pg.charName}}</span></td>
+                <td [hidden]="inModify[ind] || this.character.charName!=pg.charName" class="pr-2 pl-2 pb-1 text-center highFont">{{this.character.initiative}}</td>
+                <td [hidden]="!inModify[ind] || this.character.charName!=pg.charName" class="pr-2 pl-2 pb-1 text-center highFont">
+                  <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="this.character.initiative"
+                    value="{{this.character.initiative}}">
+                </td>
+                <td [hidden]="inModify[ind] || this.character.charName!=pg.charName" class="pr-2 pl-2 pb-1 text-center highFont">Grid: {{this.character.gridNumber}}</td>
+                <td [hidden]="!inModify[ind] || this.character.charName!=pg.charName" class="pr-2 pl-2 pb-1 text-center highFont">
+                  <input class="HPdim" type="text" style="direction: rtl" [(ngModel)]="this.character.gridNumber"
+                    value="{{this.character.gridNumber}}">
+                </td>
+                <td class="pr-2 pl-2 pb-1 text-center"><button [hidden]="inModify[ind]"
+                    class="btn btn-block btn-sm btn-outline-primary" type="button"
+                    (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
+                  <button [hidden]="!inModify[ind]" class="btn btn-block btn-sm btn-outline-success save-btn"
+                    type="button" (click)="onChangeAttribute('alive','1');onChangeAttribute('initiative',character.initiative.toString());onChangeAttribute('gridNumber',character.gridNumber.toString());inModify[ind]=false"><i class="fas fa-save save-icon"></i></button></td>
+                <td class="pr-2 pl-2 pb-2 text-center"><button [hidden]="inGrid[ind]"
+                    class="btn btn-block btn-sm btn-outline-primary" (click)="onArrange(ind, pg.charName)"
+                    type="button"><i class="fas fa-th"></i></button>
+                  <button [hidden]="!inGrid[ind]" class="btn btn-block btn-sm btn-outline-success save-btn"
+                    type="button"><i class="fas fa-save save-icon"></i></button></td>
+                <td class="pr-2 pl-2 pb-2 text-center"><button class="btn btn-block btn-sm btn-outline-danger"
+                    type="button" (click)="onDeleteChar(pg.charName)"><i class="fas fa-trash-alt"></i></button></td>
+                  </ng-container>
+            </tr>
+            
+          </table>
+        </div>
+        <div [hidden]="character.privilege=='user'" class="row">
+            <div class="col-md-5 col-lg-5 pr-1">
+              <input type="text" class="form-control" placeholder="Add a character" #newCharName>
+            </div>
+            <div class="col-md-2 col-lg-2 pl-1 pr-1">
+              <input type="number" class="form-control" placeholder="Init" #newInit>
+            </div>
+            <div class="col-md-2 col-lg-2 pl-1 pr-1">
+              <input type="text" class="form-control" placeholder="Grid" #newGridNum>
+            </div>
+            <div class="col-md-3 col-lg-3">
+              <button class="btn btn-block btn-ghost-success active"
+                (click)="onAddNpc(newCharName.value, newInit.value, newGridNum.value)" type="button">Add</button>
+            </div>
+          </div>
+        </tab>
+        
       </tabset>
     </div>
 

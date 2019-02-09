@@ -15,6 +15,6 @@ export class NewCharacterComponent implements OnInit {
   ngOnInit() {
   }
   onChangeCharName(value){
-    this.rest.updatePg('charName',value).subscribe(res=>this.router.navigate(['/campaign']),err=>this.toast.error('Something went wrong, please try again in a moment'));
+    this.rest.updateCharName(value).subscribe(res=>this.router.navigate(['/campaign']),err=>this.toast.error('Something went wrong, please try again in a moment'));
   }
 }

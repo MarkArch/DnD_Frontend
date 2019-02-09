@@ -9,10 +9,10 @@ export class character{
     hit_dice:String ="";
     diary:String ="";
     class1:String ="";
-    grid_dimension:String ="";
-    grid_zoom:number =0;
+    grid_dimension:String ="15,15";
+    grid_zoom:number =3;
     show_all:boolean =false;
-    class5:String ="";
+    alive:boolean =true;
     class6:String ="";
     level:number =0;
     eyes:String ="";
