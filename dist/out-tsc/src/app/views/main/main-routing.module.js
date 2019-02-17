@@ -12,6 +12,7 @@ var home_component_1 = require("./home/home.component");
 var grid_component_1 = require("./grid/grid.component");
 var diary_component_1 = require("./diary/diary.component");
 var sheet_component_1 = require("./sheet/sheet.component");
+var dungeon_component_1 = require("./dungeon/dungeon.component");
 var routes = [
     {
         path: '',
@@ -34,6 +35,10 @@ var routes = [
     {
         path: 'sheet',
         component: sheet_component_1.SheetComponent,
+    },
+    {
+        path:'dungeon',
+        component:dungeon_component_1.DungeonComponent,
     }
 ];
 var MainRoutingModule = /** @class */ (function () {

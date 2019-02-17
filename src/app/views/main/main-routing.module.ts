@@ -6,6 +6,7 @@ import { GridComponent } from './grid/grid.component';
 import { DiaryComponent } from './diary/diary.component';
 import { SheetComponent } from './sheet/sheet.component';
 import { AuthGuardService } from '../../shared/auth-guard.service';
+import { DungeonComponent } from './dungeon/dungeon.component';
 
 const routes: Routes = [
   {
@@ -28,8 +29,11 @@ const routes: Routes = [
   },
   {
     path: 'sheet',
-  //  canActivate: [AuthGuardService],
+    //  canActivate: [AuthGuardService],
     component: SheetComponent,
+  }, {
+    path: 'dungeon',
+    component: DungeonComponent
   }
 ];
 
@@ -37,4 +41,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class MainRoutingModule {}
+export class MainRoutingModule { }

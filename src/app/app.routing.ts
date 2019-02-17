@@ -12,6 +12,7 @@ import { GridComponent } from './views/main/grid/grid.component';
 import { HomeComponent } from './views/main/home/home.component';
 import { CampaignSelectComponent } from './views/campaign-select/campaign-select.component';
 import { NewCharacterComponent } from './views/new-character/new-character.component';
+import { DungeonComponent } from './views/main/dungeon/dungeon.component';
 
 export const routes: Routes = [
   {

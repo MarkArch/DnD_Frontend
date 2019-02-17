@@ -12,6 +12,7 @@ import { SheetComponent } from './sheet/sheet.component';
 import { DiaryComponent } from './diary/diary.component';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { FileSelectDirective } from 'ng2-file-upload';
+import { DungeonComponent } from './dungeon/dungeon.component';
 
 @NgModule({
   imports: [
@@ -26,6 +27,6 @@ import { FileSelectDirective } from 'ng2-file-upload';
   ],
   declarations: [
     HomeComponent,
-    GridComponent, SheetComponent, DiaryComponent, FileSelectDirective]
+    GridComponent, SheetComponent, DiaryComponent, FileSelectDirective,DungeonComponent]
 })
 export class MainModule { }

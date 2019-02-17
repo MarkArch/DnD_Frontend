@@ -26,6 +26,11 @@ exports.navItems = [
         name: 'Char Sheet',
         url: '/sheet',
         icon: 'fas fa-newspaper',
+    },
+    {
+        name:'Dungeon',
+        url: '/dungeon',
+        icon: 'fas fa-dungeon'
     }
 ];
 //# sourceMappingURL=_nav.js.map

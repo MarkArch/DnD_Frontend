@@ -1,0 +1,68 @@
+<div class="card" *ngIf="this.character!=null">
+  <div class="card-header"> Combat - Grid
+    <div class="card-header-actions">
+      <label class="switch switch-sm switch-label switch-pill switch-outline-primary-alt mb-0 mr-2 align-middle">
+        <input type="checkbox" class="switch-input" (click)="onShowGridSettings()">
+        <span class="switch-slider" data-checked="On" data-unchecked="Off"></span>
+      </label> <span class="align-middle"> Grid Settings </span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div style="width: 100%">
+      <div class="input-group mb-3" *ngIf="this.character.privilege=='master'">
+        <div class="input-group" style="width: 50%">
+          <ng-container *ngIf="setObjectOnGrid==true">
+            <select #object class="custom-select" (click)="objectName=object.value">
+              <option>tree</option>
+              <option>horizontal wall</option>
+              <option>vertical wall</option>
+              <option>door-closed</option>
+              <option>dungeon</option>
+            </select>
+          </ng-container>
+          <div class="input-group-append">
+            <button (click)="onSetObjectOnGrid()" type="button"
+              [ngClass]="setObjectOnGrid==false?'btn btn-outline-dark':'btn btn-dark'">Add
+              Object</button>
+            <button type="button" (click)="onDeleteObjectFromGrid()"
+              [ngClass]="deleteObjectFromGrid==false?'btn btn-outline-dark':'btn btn-dark'">Delete
+              Object</button>
+            <button class="btn btn-outline-dark" type="button" (click)="onGridEmpty()">Empty Grid</button>
+            <button class="btn btn-outline-dark" type="button" (click)="onObjectGridEmpty()">Empty Object on
+              Grid</button>
+            <button [ngClass]="notify==false?'btn btn-outline-dark':'btn btn-dark'" type="button"
+              (click)="notify==true?notify=false:notify=true">Notify
+              Something to the party</button>
+            <input type="text" [hidden]="!notify" (keydown)="onKeydown($event,notification.value)" #notification>
+          </div>
+        </div>
+        <!-- <div><input type="file" ng2FileSelect [uploader]="uploader"><button (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">Save</button> 
+          </div> -->
+      </div>
+    </div>
+    <div class="col-md-8 col-lg-8 float-left over">
+      <div [hidden]="!gridSettingVisible" class="card p-2">
+        <h5>Set squares number: <input class="HPdim" type="number" [(ngModel)]="x" value="x"
+            (ngModelChange)="this.onChangeAttribute('grid_dimension',x+','+y)">
+          X
+          <input class="HPdim" type="number" [(ngModel)]="y" value="y"
+            (ngModelChange)="this.onChangeAttribute('grid_dimension',x+','+y)">
+          <span class="float-right">Set squares dimension:
+            <input type="range" min="1" max="4" class="slider" [(ngModel)]="this.character.grid_zoom"
+              value="this.character.grid_zoom"
+              (ngModelChange)="this.onChangeAttribute('grid_zoom',this.character.grid_zoom)"></span></h5>
+      </div>
+      <table class="border separate">
+        <tr [@gridAnimation]="this.character.grid_zoom" class="grid border" *ngFor="let row of yAxis; let y = index">
+          <td (mousedown)="onMouseDown(x,y)" (mouseup)="onMouseUp(x,y)" [@gridAnimation]="this.character.grid_zoom"
+            #cell class="grid border" *ngFor="let col of xAxis; let x = index" (click)="onGridClick(x,y,cell)"
+            [ngStyle]="{'background-color': x==ping.x && y==ping.y?'lightblue':searchCharacterOnGrid(x,y)=='P'?'silver':searchCharacterOnGrid(x,y)=='vertical' ||searchCharacterOnGrid(x,y)=='horizontal'?'black':'white', color: transparent}">
+            <i class="fas fa-{{searchCharacterOnGrid(x,y)}} fa-2x"
+              [ngStyle]="{'color': onCheckFriend(x, y) ? 'blue':'red'}"></i>
+          </td>
+        </tr>
+      </table>
+      </div>
+  </div>
+  
+</div>

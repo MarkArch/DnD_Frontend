@@ -1,6 +1,5 @@
 <div class="card">
   <div class="container">
-
     <!-- Little trick to center the inputs to the viewer -->
     <div class="form-container" *ngIf="loadEnded==true && myForm!=null">
       <form id="input-form" [formGroup]="myForm" novalidate>
@@ -10,7 +9,9 @@
           <ng-container *ngIf="validateInput(input.name)">
             <!-- Insert an input accordingly and get the style/position from the component -->
             <input type="text" [name]="input.name" [formControlName]="input.name" [value]="inputValue(input.name,input)"
-              (ngModelChange)="onChangeAttributeValue(input.name,input.value)" [ngStyle]="getInputPosition(input)">
+              (ngModelChange)="onChangeAttributeValue(input.name,input.value)" [ngStyle]="getInputPosition(input)" *ngIf="!input.name.includes('Check Box')">
+              <input type="checkbox" [name]="input.name" [formControlName]="input.name" [checked]="inputValue(input.name,input)"
+              (click)="checkbox(input.name)" [ngStyle]="getInputPosition(input)" *ngIf="input.name.includes('Check Box')">
           </ng-container>
           <ng-container *ngIf="validateLabel(input.name)">
             <label [formControlName]="input.name" [ngStyle]="getInputPosition(input)">{{inputValue(input.name)}}</label>
@@ -18,12 +19,14 @@
         </div>
       </form>
     </div>
-    <pdf-viewer id="viewer" [src]="pdfSrc" (after-load-complete)="loadComplete($event)" [show-all]="false" [page]="1"></pdf-viewer>
+    <pdf-viewer id="viewer" [src]="pdfSrc" (after-load-complete)="loadComplete($event)" [show-all]="false" [page]="1">
+    </pdf-viewer>
   </div>
+
   <div class="row" *ngIf="loadEnded==true && myForm!=null">
-    <div class="col-3"></div>
-    <button class="btn btn-success col-3 pr-2" (click)="onSave()">Save</button>
-    <button class="btn btn-danger col-3 pr-2" (click)="onDiscard()">Discard</button>
-    <div class="col-3"></div>
-  </div>
+      <div class="col-3"></div>
+      <button class="btn btn-outline-success col-3 pr-2" (click)="onSave()">Save</button>
+      <button class="btn btn-outline-danger col-3 pr-2" (click)="onDiscard()">Discard</button>
+      <div class="col-3"></div>
+    </div>
 </div>

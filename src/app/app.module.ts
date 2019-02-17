@@ -60,6 +60,7 @@ import { PdfViewerModule} from 'ng2-pdf-viewer'
 import { ToastrModule } from 'ngx-toastr';
 import { FileSelectDirective } from 'ng2-file-upload';
 import { NewCharacterComponent } from './views/new-character/new-character.component';
+import { DungeonComponent } from './views/main/dungeon/dungeon.component';
 export function getAuthServiceConfigs() {
   let config = new AuthServiceConfig(
       [

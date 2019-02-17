@@ -55,9 +55,11 @@ display: block
 }
 
 .container {
-    margin: 2rem;
+    margin: 0;
     display: flex;
     justify-content: center;
+    max-width: 100% !important;
+
   }
   
   #input-form {
@@ -72,6 +74,8 @@ display: block
       & label{
         position: absolute;
         background: transparent;
-        text-align: center
+        text-align: center;
+        font-size: 10px;
+        vertical-align: middle;
       }
   }

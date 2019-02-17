@@ -24,5 +24,9 @@ export const navItems = [
     name: 'Char Sheet',
     url: '/sheet',
     icon: 'fas fa-newspaper',
+  }, {
+    name: 'Dungeon',
+    url: '/dungeon',
+    icon: 'fas fa-dungeon'
   }
 ];

@@ -62,11 +62,11 @@ export class GridComponent implements OnInit, OnDestroy {
   constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService, private shareVariable: SharedVariableService, private toastr: ToastrService) {
     this.service.chooseCharacter("", 0).subscribe(res => {
       this.service.accounts().subscribe((res: postlogin[]) => {
-        this.accounts = res;console.log(this.accounts)
+        this.accounts = res; console.log(this.accounts)
       });
       this.shared.character = res; this.character = this.shared.character;
       console.log(this.character);
-      this.service.getPossibleViews("12").subscribe((res: grid[]) => {
+      this.service.getPossibleViews("50").subscribe((res: grid[]) => {
         console.log("possible views", res),
           this.possibleViews = res;
         this.minX = this.possibleViews[0].x;
@@ -92,20 +92,19 @@ export class GridComponent implements OnInit, OnDestroy {
         console.log(res);
         this.sessionPlayers = res;
         this.sessionPlayers.forEach(p => {
-          let healthStatus='';
-          if((p.current_hp / p.hp)>0.80){
-            healthStatus='Healthy'
-          }else if((p.current_hp / p.hp)>0.50){
-            healthStatus='Quite healthy'
-          }else if((p.current_hp / p.hp)>0.25){
-            healthStatus='Damaged'
-          }else if((p.current_hp / p.hp)>0){
-            healthStatus='Really Damaged'
-          }else{
-            healthStatus='To the ground'
+          let healthStatus = '';
+          if ((p.current_hp / p.hp) > 0.80) {
+            healthStatus = 'Healthy'
+          } else if ((p.current_hp / p.hp) > 0.50) {
+            healthStatus = 'Quite healthy'
+          } else if ((p.current_hp / p.hp) > 0.25) {
+            healthStatus = 'Damaged'
+          } else if ((p.current_hp / p.hp) > 0) {
+            healthStatus = 'Really Damaged'
+          } else {
+            healthStatus = 'To the ground'
           };
           this.tooltip.push("Current HP: " + healthStatus);
-          this.inModify.push(false);
           this.inGrid.push(false);
           this.isFriend.push(false);
         })
@@ -188,8 +187,10 @@ export class GridComponent implements OnInit, OnDestroy {
   maxX = 0;
   minY = 0;
   maxY = 0;
+  clickStart: grid = new grid();
+  clickEnd: grid = new grid();
   public isFriend = [];
-  public inModify = [];
+  public inModify = false;
   public inGrid = [];
   public gridSettingVisible = false;
   public tooltip: any[] = [];
@@ -215,11 +216,10 @@ export class GridComponent implements OnInit, OnDestroy {
   }
 
   onNextTurn() {
-    if (this.inModify[this.turn] === false) {
+    if (this.inModify=== false) {
       this.service.getNextTurn().subscribe((res: number) => {
-        this.turn = res; while (this.turn >= this.sessionPlayers.length) {
-          this.turn = this.turn - this.sessionPlayers.length;
-        }
+        console.log(res);
+        this.turn = res; 
         if (this.sessionPlayers[this.turn].charName == this.character.charName) {
           this.service.getBuffUpdate().subscribe();
         }
@@ -239,7 +239,7 @@ export class GridComponent implements OnInit, OnDestroy {
               this.charecterPosition.y = position.y;
             }
           }
-          this.service.getPossibleViews("12").subscribe((res: grid[]) => {
+          this.service.getPossibleViews("50").subscribe((res: grid[]) => {
             console.log("possible views", res),
               this.possibleViews = res;
             this.minX = this.possibleViews[0].x;
@@ -251,6 +251,7 @@ export class GridComponent implements OnInit, OnDestroy {
         });
       } else if (res == 'notification') {
         this.service.getNotification().subscribe(res => {
+          console.log(res);
           this.toastr.info('The Master say: ' + res);
           this.syncroPositions();
         })
@@ -259,42 +260,44 @@ export class GridComponent implements OnInit, OnDestroy {
   }
   searchCharacterOnGrid(x, y): String {
     let a = "";
-      this.grid.forEach(char => {
-        if (char.x == x && char.y == y) {
-          if (char.charName == "tree") {
-            return a = "tree";
-          } else if (char.charName == "horizontal wall") {
-            return a = "grip-lines";
-          } else if (char.charName == "vertical wall") {
-            return a = "grip-lines-vertical"
-          } else if (char.charName == "dungeon") {
-            return a = "dungeon";
-          } else if (char.charName == "door-closed") {
-            return a = "door-closed"
-          } else {
-            for (let i in this.sessionPlayers) {
-              if (this.sessionPlayers[i].charName == char.charName) {
-                a = this.sessionPlayers[i].gridNumber;
-                if (this.sessionPlayers[i].privilege == 'user') {
-                  this.isFriend[i] = true;
-                }
+    this.grid.forEach(char => {
+      if (char.x == x && char.y == y) {
+        if (char.charName == "tree") {
+          return a = "tree";
+        } else if (char.charName == "horizontal wall") {
+          //return a = "grip-lines";
+          return a = "horizontal";
+        } else if (char.charName == "vertical wall") {
+          // return a = "grip-lines-vertical"
+          return a = "vertical"
+        } else if (char.charName == "dungeon") {
+          return a = "dungeon";
+        } else if (char.charName == "door-closed") {
+          return a = "door-closed"
+        } else {
+          for (let i in this.sessionPlayers) {
+            if (this.sessionPlayers[i].charName == char.charName) {
+              a = this.sessionPlayers[i].gridNumber;
+              if (this.sessionPlayers[i].privilege == 'user') {
+                this.isFriend[i] = true;
               }
             }
           }
         }
-      });
+      }
+    });
 
-      this.possibleMoves.forEach(char => {
-        if (char.x == x && char.y == y) {
-          a = "P";
-        }
-      });
-      if (this.minX <= x && x <= this.maxX && this.minY <= y && y <= this.maxY) {
-          }else{
-            if(this.character.privilege=='user'){
-              a="";
-            }
-          }
+    this.possibleMoves.forEach(char => {
+      if (char.x == x && char.y == y) {
+        a = "P";
+      }
+    });
+    if (this.minX <= x && x <= this.maxX && this.minY <= y && y <= this.maxY) {
+    } else {
+      if (this.character.privilege == 'user') {
+        a = "";
+      }
+    }
     return a;
   }
 
@@ -325,20 +328,19 @@ export class GridComponent implements OnInit, OnDestroy {
       this.sessionPlayers = res;
       this.tooltip = [];
       this.sessionPlayers.forEach(p => {
-        let healthStatus='';
-          if((p.current_hp / p.hp)>0.80){
-            healthStatus='Healthy'
-          }else if((p.current_hp / p.hp)>0.50){
-            healthStatus='Quite healthy'
-          }else if((p.current_hp / p.hp)>0.25){
-            healthStatus='Damaged'
-          }else if((p.current_hp / p.hp)>0){
-            healthStatus='Really Damaged'
-          }else{
-            healthStatus='To the ground'
-          };
-          this.tooltip.push("Current HP: " + healthStatus);
-        this.inModify.push(false);
+        let healthStatus = '';
+        if ((p.current_hp / p.hp) > 0.80) {
+          healthStatus = 'Healthy'
+        } else if ((p.current_hp / p.hp) > 0.50) {
+          healthStatus = 'Quite healthy'
+        } else if ((p.current_hp / p.hp) > 0.25) {
+          healthStatus = 'Damaged'
+        } else if ((p.current_hp / p.hp) > 0) {
+          healthStatus = 'Really Damaged'
+        } else {
+          healthStatus = 'To the ground'
+        };
+        this.tooltip.push("Current HP: " + healthStatus);
       })
       this.service.getBuff().subscribe((res: buff[]) => {
         this.buffs = res;
@@ -570,12 +572,13 @@ export class GridComponent implements OnInit, OnDestroy {
       }
       this.settingOnGrid = false;
       this.possibleMoves = [];
+      this.onChangeAttribute('alive', '1');
     } else if (this.setObjectOnGrid == true) {
       this.service.setObjectOnGrid(this.objectName, x, y).subscribe();
     } else if (this.deleteObjectFromGrid == true) {
       this.service.deleteObjectOnGrid("", x, y).subscribe();
     } else if (this.pingTimes < 3) {
-      this.service.pingGrid(x, y).subscribe(res => {if(this.character.privilege=='user')this.pingTimes += 1});
+      this.service.pingGrid(x, y).subscribe(res => { if (this.character.privilege == 'user') this.pingTimes += 1 });
       if (this.pingTimes == 3)
         setTimeout(() => { this.pingTimes = 0 }, 60000);
     }
@@ -588,16 +591,16 @@ export class GridComponent implements OnInit, OnDestroy {
 
   onEditInitiative(i, currChar) {
     if (this.character.charName === currChar) {
-      this.inModify[i] = true;
+      this.inModify = true;
     }
   }
 
-  onSaveInitiative(i) {
-    this.character.initiative = this.sessionPlayers[i].initiative;
-    this.character.gridNumber = this.sessionPlayers[i].gridNumber;
+  onSaveInitiative(initiative,gridNumber) {
+    this.character.initiative = initiative;
+    this.character.gridNumber = gridNumber;
     this.onChangeAttribute('initiative', this.character.initiative.toString());
     this.onChangeAttribute('gridNumber', this.character.gridNumber.toString());
-    this.inModify[i] = false;
+    this.inModify = false;
   }
 
   onArrange(i, currChar) {
@@ -624,9 +627,9 @@ export class GridComponent implements OnInit, OnDestroy {
     });
   }
 
-  onChangeChar(i) {
-    if (this.character.privilege == 'master' && this.accounts[i]!= null) {
-      this.service.chooseCharacter(this.accounts[i].charName, this.accounts[i].session_id).subscribe(res => {
+  onChangeChar(charName) {
+    if (this.character.privilege == 'master') {
+      this.service.chooseCharacter(charName, this.character.session_id).subscribe(res => {
         this.character = res;
         this.statInitializer();
         this.service.getPositions().subscribe((res: grid[]) => {
@@ -683,7 +686,7 @@ export class GridComponent implements OnInit, OnDestroy {
     }
   }
   onGridEmpty() {
-    this.service.emptyGrid().subscribe();
+    this.service.emptyGrid().subscribe(res => { this.charecterPosition.x = null; this.charecterPosition.y = null });
   }
   onObjectGridEmpty() {
     this.service.emptyObjectGrid().subscribe();
@@ -712,8 +715,41 @@ export class GridComponent implements OnInit, OnDestroy {
   saveFile(file) {
     console.log(file.value);
   }
-  onDeleteChar(charName){
-    if(this.character.charName==charName)
-    this.service.updatePg('alive','0').subscribe(res=>{this.toastr.success('Character has been removed with success')});
+  onDeleteChar(charName) {
+    if (this.character.charName == charName)
+      this.service.updatePg('alive', '0').subscribe(res => {
+        this.toastr.success('Character has been removed with success'); this.service.getPositions().subscribe((res: grid[]) => {
+          this.grid = res; for (let position of this.grid) {
+            this.charecterPosition.x = null;
+            this.charecterPosition.y = null;
+            if (position.charName == this.character.charName) {
+              this.charecterPosition.charName = position.charName;
+              this.charecterPosition.x = position.x;
+              this.charecterPosition.y = position.y;
+            }
+          }
+        });
+      });
+  }
+  onMouseDown(x, y) {
+    this.clickStart.x = x;
+    this.clickStart.y = y;
+    console.log(this.clickStart)
+  };
+  onMouseUp(x, y) {
+    this.clickEnd.x = x;
+    this.clickEnd.y = y;
+    console.log(this.clickEnd);
+    let xMin = Math.min(this.clickStart.x, this.clickEnd.x);
+    let xMax = Math.max(this.clickStart.x, this.clickEnd.x);
+    let yMin = Math.min(this.clickStart.y, this.clickEnd.y);
+    let yMax = Math.max(this.clickStart.y, this.clickEnd.y);
+    for (let a = xMin; a <= xMax; a++) {
+      for (let b = yMin; b <= yMax; b++) {
+        if (this.setObjectOnGrid == true) {
+          this.service.setObjectOnGrid(this.objectName, a, b).subscribe();
+        }
+      }
+    }
   }
 }

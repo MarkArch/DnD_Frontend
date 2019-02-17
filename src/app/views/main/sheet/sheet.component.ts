@@ -40,7 +40,8 @@ export class SheetComponent implements OnInit {
     "Speed",
     "HPMax",
     "HPCurrent",
-     "HD"];
+    "HD",
+    "Check Box 11","Check Box 18","Check Box 19","Check Box 20","Check Box 21","Check Box 22",];
   validLabel: String[] = [
     "CharacterName",
     "STRmod",
@@ -48,8 +49,14 @@ export class SheetComponent implements OnInit {
     "CONmod",
     "INTmod",
     "WISmod",
-    "CHamod",];
-  inputToBeSet: String[] = ["Background", "Race ", "XP","HPTemp",]
+    "CHamod",
+    "ST Strength",
+    "ST Dexterity",
+    "ST Constitution",
+    "ST Intelligence",
+    "ST Wisdom",
+    "ST Charisma",];
+  inputToBeSet: String[] = ["Background", "Race ", "XP", "HPTemp",]
   constructor(public httpServ: RestServiceService, public shared: SharedVariableService, private _fb: FormBuilder, private toastr: ToastrService) {
     this.httpServ.chooseCharacter("", 0).subscribe(res => {
       this.shared.character = res; this.character = this.shared.character;
@@ -68,7 +75,8 @@ export class SheetComponent implements OnInit {
     this.httpServ.campaignChosed().subscribe(res => console.log(res));
   }
   onChangeAttribute(name: String, value: String) {
-    this.httpServ.updatePg(name, value).subscribe();
+    console.log("ehi", name, value)
+    // this.httpServ.updatePg(name, value).subscribe();
   }
   onSave() {
     this.httpServ.multipleUpdateOnPg(this.character).subscribe(res => { this.shared.character = this.character, this.toastr.success('Your update was successful') }, err => { this.toastr.error('There was an error while trying to process your request, please try again later') });
@@ -103,6 +111,7 @@ export class SheetComponent implements OnInit {
           });
       });
     }
+    console.log(this.inputList)
   }
   private createInput(annotation: PDFAnnotationData, rect: number[] = null) {
     let formControl = new FormControl(annotation.buttonValue || '');
@@ -180,6 +189,71 @@ export class SheetComponent implements OnInit {
     else if (name == "INTmod") return Math.floor((this.character.intelligence - 10) / 2);
     else if (name == "WISmod") return Math.floor((this.character.weasdom - 10) / 2);
     else if (name == "CHamod") return Math.floor((this.character.charisma - 10) / 2);
+    else if (name == "Check Box 11") {
+      if (this.character.savingThrow_strenght == 0) { 
+        return false; }
+      else { 
+        return true; 
+      }
+    }
+    else if (name == "Check Box 18") {
+      if (this.character.savingThrow_dexterity == 0) { return false; }
+      else { 
+        return true; }
+    }else if (name == "Check Box 19") {
+      if (this.character.savingThrow_constitution == 0) { return false; }
+      else { 
+        return true; }
+    }else if (name == "Check Box 20") {
+      if (this.character.savingThrow_intelligence == 0) { return false; }
+      else { 
+        return true; }
+    }else if (name == "Check Box 21") {
+      if (this.character.savingThrow_weasdom == 0) { return false; }
+      else { 
+        return true; }
+    }else if (name == "Check Box 22") {
+      if (this.character.savingThrow_charisma == 0) { return false; }
+      else { 
+        return true; }
+    }else if (name == "ST Strength") {
+      if (this.character.savingThrow_strenght == 1) { 
+        return + Math.floor((this.character.strenght - 10) / 2)+this.character.proficiencyBonus }
+      else { 
+        return +Math.floor((this.character.strenght - 10) / 2); 
+      }
+    }
+    else if (name == "ST Dexterity") {
+      if (this.character.savingThrow_dexterity == 1) { 
+        return  +Math.floor((this.character.dexterity - 10) / 2)+this.character.proficiencyBonus }
+      else { 
+        return +Math.floor((this.character.dexterity - 10) / 2); 
+      }
+    }else if (name == "ST Constitution") {
+      if (this.character.savingThrow_constitution == 1) {
+        return  +Math.floor((this.character.constitution - 10) / 2)+this.character.proficiencyBonus }
+      else { 
+        return +Math.floor((this.character.constitution - 10) / 2); 
+      }
+    }else if (name == "ST Intelligence") {
+      if (this.character.savingThrow_intelligence == 1) { 
+        return  +Math.floor((this.character.intelligence - 10) / 2)+this.character.proficiencyBonus }
+      else { 
+        return +Math.floor((this.character.intelligence - 10) / 2); 
+      }
+    }else if (name == "ST Wisdom") {
+      if (this.character.savingThrow_weasdom == 1) {
+        return  +Math.floor((this.character.weasdom - 10) / 2)+this.character.proficiencyBonus }
+      else { 
+        return +Math.floor((this.character.weasdom - 10) / 2); 
+      }
+    }else if (name == "ST Charisma") {
+      if (this.character.savingThrow_charisma == 1) {
+        return  +Math.floor((this.character.charisma - 10) / 2)+this.character.proficiencyBonus }
+      else { 
+        return +Math.floor((this.character.charisma - 10) / 2); 
+      }
+    }
   }
   onChangeAttributeValue(name, value) {
     if (name == "CharacterName")
@@ -211,8 +285,39 @@ export class SheetComponent implements OnInit {
     else if (name == "HPCurrent") this.character.current_hp = this.myForm.get("HPCurrent").value;
     //else if( name=="HPTemp") this.character.
     else if (name == "HD") this.character.hit_dice = this.myForm.get("HD").value;
+    // else if (name == "Check Box 11") this.character.savingThrow_strenght=this.myForm.get("Check Box 11").value; 
   }
-  onDiscard(){
-    this.httpServ.chooseCharacter('',0).subscribe(res=>{this.character=res;this.toastr.success('Your character has been restored')})
+  onDiscard() {
+    this.httpServ.chooseCharacter('', 0).subscribe(res => { this.character = res; this.toastr.success('Your character has been restored') })
+  }
+  checkbox(name){
+    if (name == "Check Box 11") {
+      if (this.character.savingThrow_strenght == 0) { 
+        this.character.savingThrow_strenght=1 }
+      else { 
+        this.character.savingThrow_strenght=0 
+      }
+    }
+    else if (name == "Check Box 18") {
+      if (this.character.savingThrow_dexterity == 0) { this.character.savingThrow_dexterity=1 }
+      else { 
+        this.character.savingThrow_dexterity=0 }
+    }else if (name == "Check Box 19") {
+      if (this.character.savingThrow_constitution == 0) { this.character.savingThrow_constitution=1 }
+      else { 
+        this.character.savingThrow_constitution=0 }
+    }else if (name == "Check Box 20") {
+      if (this.character.savingThrow_intelligence == 0) {this.character.savingThrow_intelligence=1 }
+      else { 
+        this.character.savingThrow_intelligence=0 }
+    }else if (name == "Check Box 21") {
+      if (this.character.savingThrow_weasdom == 0) { this.character.savingThrow_weasdom=1 }
+      else { 
+        this.character.savingThrow_weasdom=0 }
+    }else if (name == "Check Box 22") {
+      if (this.character.savingThrow_charisma == 0) { this.character.savingThrow_charisma=1 }
+      else { 
+        this.character.savingThrow_charisma=0 }
+    };
   }
 }
