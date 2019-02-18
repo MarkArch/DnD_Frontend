@@ -57,8 +57,14 @@
           <td (mousedown)="onMouseDown(x,y)" (mouseup)="onMouseUp(x,y)" [@gridAnimation]="this.character.grid_zoom"
             #cell class="grid border" *ngFor="let col of xAxis; let x = index" (click)="onGridClick(x,y,cell)"
             [ngStyle]="{'background-color': x==ping.x && y==ping.y?'lightblue':searchCharacterOnGrid(x,y)=='P'?'silver':searchCharacterOnGrid(x,y)=='vertical' ||searchCharacterOnGrid(x,y)=='horizontal'?'black':'white', color: transparent}">
-            <i class="fas fa-{{searchCharacterOnGrid(x,y)}} fa-2x"
-              [ngStyle]="{'color': onCheckFriend(x, y) ? 'blue':'red'}"></i>
+            <div style="position: relative;">
+              <i class="fas fa-{{searchCharacterOnGrid(x,y)}} fa-2x"
+                [ngStyle]="{'color': onCheckFriend(x, y) ? 'blue':'red',position:absolute,top:0,left:0,opacity:onSearchCharacterHp(x,y)?1:0.5}"></i>
+              <label
+                Style="position: absolute;top: 0;right: 0;width: 7%;color: black;margin: 0;padding: 0;font-size: 20%"><strong>{{onSearchMasterCharacter(x,y)}}</strong></label>
+              <ng-container *ngIf="!onSearchCharacterHp(x,y)"><i [hidden]="isIntermittent" class="fas fa-skull"
+                  Style="position: absolute;top: 0;left: 0;width: 7%;color: black"></i></ng-container>
+            </div>
           </td>
         </tr>
       </table>
@@ -152,15 +158,17 @@
                   <td class="pr-2 pl-2 pb-1 text-center"><i *ngIf="ind==turn" class="fas fa-caret-right"></i></td>
                   <td class="pr-2 pl-2 pb-1 text-center highFont"><span [tooltip]="tooltip[ind]" triggers="click"
                       (click)="onChangeChar(pg.charName)"
-                      [ngStyle]="{'color':pg.current_hp/pg.hp>0.25?'black':pg.current_hp/pg.hp==0?'red':'orange'}"><strong>{{pg.charName}}</strong></span>
+                      [ngStyle]="{'color':pg.current_hp/pg.hp>0.50?'#23b831':pg.current_hp/pg.hp>0.25?'#e2c329':pg.current_hp/pg.hp==0?'#8208aa':'#db711c'}"><strong>{{pg.charName}}</strong></span>
                   </td>
                   <td [hidden]="inModify" class="pr-2 pl-2 pb-1 text-center highFont">{{pg.initiative}}</td>
-                  <td [hidden]="!inModify || pg.charName!=character.charName" class="pr-2 pl-2 pb-1 text-center highFont">
+                  <td [hidden]="!inModify || pg.charName!=character.charName"
+                    class="pr-2 pl-2 pb-1 text-center highFont">
                     <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="pg.initiative"
                       value="{{pg.initiative}}">
                   </td>
                   <td [hidden]="inModify" class="pr-2 pl-2 pb-1 text-center highFont">Grid: {{pg.gridNumber}}</td>
-                  <td [hidden]="!inModify || pg.charName!=character.charName" class="pr-2 pl-2 pb-1 text-center highFont">
+                  <td [hidden]="!inModify || pg.charName!=character.charName"
+                    class="pr-2 pl-2 pb-1 text-center highFont">
                     <input class="HPdim" type="text" style="direction: rtl" [(ngModel)]="pg.gridNumber"
                       value="{{pg.gridNumber}}">
                   </td>
@@ -169,7 +177,8 @@
                         class="btn btn-block btn-sm btn-outline-primary" type="button"
                         (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
                       <button [hidden]="!inModify" class="btn btn-block btn-sm btn-outline-success save-btn"
-                        type="button" (click)="onSaveInitiative(pg.initiative,pg.gridNumber)"><i class="fas fa-save save-icon"></i></button>
+                        type="button" (click)="onSaveInitiative(pg.initiative,pg.gridNumber)"><i
+                          class="fas fa-save save-icon"></i></button>
                     </td>
                     <td class="pr-2 pl-2 pb-2 text-center"><button [hidden]="inGrid[ind]"
                         class="btn btn-block btn-sm btn-outline-primary" (click)="onArrange(ind, pg.charName)"
@@ -185,12 +194,14 @@
                   <td class="pr-2 pl-2 pb-1 text-center highFont"><span [tooltip]="tooltip[ind]" triggers="click"
                       (click)="onChangeChar(pg.charName)">{{pg.charName}}</span></td>
                   <td [hidden]="inModify" class="pr-2 pl-2 pb-1 text-center highFont">{{pg.initiative}}</td>
-                  <td [hidden]="!inModify || pg.charName!=character.charName" class="pr-2 pl-2 pb-1 text-center highFont">
+                  <td [hidden]="!inModify || pg.charName!=character.charName"
+                    class="pr-2 pl-2 pb-1 text-center highFont">
                     <input class="HPdim" type="number" style="direction: rtl" [(ngModel)]="pg.initiative"
                       value="{{pg.initiative}}">
                   </td>
                   <td [hidden]="inModify" class="pr-2 pl-2 pb-1 text-center highFont">Grid: {{pg.gridNumber}}</td>
-                  <td [hidden]="!inModify || pg.charName!=character.charName" class="pr-2 pl-2 pb-1 text-center highFont">
+                  <td [hidden]="!inModify || pg.charName!=character.charName"
+                    class="pr-2 pl-2 pb-1 text-center highFont">
                     <input class="HPdim" type="text" style="direction: rtl" [(ngModel)]="pg.gridNumber"
                       value="{{pg.gridNumber}}">
                   </td>
@@ -199,7 +210,8 @@
                         class="btn btn-block btn-sm btn-outline-primary" type="button"
                         (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
                       <button [hidden]="!inModify" class="btn btn-block btn-sm btn-outline-success save-btn"
-                        type="button" (click)="onSaveInitiative(pg.initiative,pg.gridNumber)"><i class="fas fa-save save-icon"></i></button>
+                        type="button" (click)="onSaveInitiative(pg.initiative,pg.gridNumber)"><i
+                          class="fas fa-save save-icon"></i></button>
                     </td>
                     <td class="pr-2 pl-2 pb-2 text-center"><button [hidden]="inGrid[ind]"
                         class="btn btn-block btn-sm btn-outline-primary" (click)="onArrange(ind, pg.charName)"
@@ -373,8 +385,7 @@
                   <td class="pr-2 pl-2 pb-1 text-center"><button [hidden]="inModify"
                       class="btn btn-block btn-sm btn-outline-primary" type="button"
                       (click)="onEditInitiative(ind, pg.charName)"><i class="fas fa-pen"></i></button>
-                    <button [hidden]="!inModify" class="btn btn-block btn-sm btn-outline-success save-btn"
-                      type="button"
+                    <button [hidden]="!inModify" class="btn btn-block btn-sm btn-outline-success save-btn" type="button"
                       (click)="onChangeAttribute('alive','1');onChangeAttribute('initiative',character.initiative.toString());onChangeAttribute('gridNumber',character.gridNumber.toString());inModify=false"><i
                         class="fas fa-save save-icon"></i></button></td>
                   <td class="pr-2 pl-2 pb-2 text-center"><button [hidden]="inGrid[ind]"

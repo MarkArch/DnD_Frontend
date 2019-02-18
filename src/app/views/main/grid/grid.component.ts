@@ -147,7 +147,7 @@ export class GridComponent implements OnInit, OnDestroy {
         });
       });
     }, err => this.router.navigate(['/campaign']));
-
+    this.onDeadPlayer();
   }
   public diceThrow;
   public accounts: postlogin[] = [];
@@ -189,6 +189,7 @@ export class GridComponent implements OnInit, OnDestroy {
   maxY = 0;
   clickStart: grid = new grid();
   clickEnd: grid = new grid();
+  isIntermittent=false;
   public isFriend = [];
   public inModify = false;
   public inGrid = [];
@@ -751,5 +752,36 @@ export class GridComponent implements OnInit, OnDestroy {
         }
       }
     }
+  }
+  onSearchCharacterHp(x,y){
+    let a=99;
+    this.grid.forEach(g=>{
+      if(g.x==x && g.y==y){
+        this.sessionPlayers.forEach(p=>{
+          if(p.charName==g.charName){
+            a=p.current_hp;
+          }
+        })
+      }
+    })
+    return a;
+  }
+  onDeadPlayer(){
+    setInterval(()=>{
+      this.isIntermittent=!this.isIntermittent;
+    },700)
+  }
+  onSearchMasterCharacter(x,y){
+    let a='';
+    this.grid.forEach(g=>{
+      if(g.x==x && g.y==y){
+        this.sessionPlayers.forEach(p=>{
+          if(p.privilege=='master' && g.charName.includes('nemy')){
+            a=g.charName.substring(5);
+          }
+        })
+      }
+    })
+    return a;
   }
 }
