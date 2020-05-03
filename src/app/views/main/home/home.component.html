@@ -3,7 +3,7 @@
         <div class="row">
             <div [ngClass]="largeImage==false?'col-8':'col-12'">
                 <h1 class="text-center">{{sessionName}}</h1><img [src]="map" class="img-fluid p-2"
-                    [ngStyle]="{'width':largeImage==true?'100%':'','cursor':largeImage==true?'zoom-out':'zoom-in'}"
+                    [ngStyle]="{'width':'100%','cursor':largeImage==true?'zoom-out':'zoom-in'}"
                     (click)="largeImage==true?largeImage=false:largeImage=true">
             </div>
             <div class="col-4" *ngIf="largeImage==false">

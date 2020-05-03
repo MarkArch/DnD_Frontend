@@ -28,5 +28,10 @@ export const navItems = [
     name: 'Dungeon',
     url: '/dungeon',
     icon: 'fas fa-dungeon'
-  }
+  },
+  {
+    name:'Video Chat',
+    url: '/video_chat',
+    icon: 'fas fa-video'
+}
 ];

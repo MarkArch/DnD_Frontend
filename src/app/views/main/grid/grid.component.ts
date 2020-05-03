@@ -104,7 +104,7 @@ export class GridComponent implements OnInit, OnDestroy {
           } else {
             healthStatus = 'To the ground'
           };
-          this.tooltip.push("Current HP: " + healthStatus);
+          this.tooltip.push("The Player  "+p.gridNumber+" is with Current HP: " + healthStatus);
           this.inGrid.push(false);
           this.isFriend.push(false);
         })
@@ -221,9 +221,6 @@ export class GridComponent implements OnInit, OnDestroy {
       this.service.getNextTurn().subscribe((res: number) => {
         console.log(res);
         this.turn = res; 
-        if (this.sessionPlayers[this.turn].charName == this.character.charName) {
-          this.service.getBuffUpdate().subscribe();
-        }
       });
     }
   }
@@ -374,9 +371,6 @@ export class GridComponent implements OnInit, OnDestroy {
   syncroTurn() {
     this.syncroTurnSubscription = this.service.getSyncroTurn().subscribe(res => {
       this.turn = +res;
-      while (this.turn >= this.sessionPlayers.length) {
-        this.turn = this.turn - this.sessionPlayers.length;
-      }
       this.syncroTurn()
     });
   }

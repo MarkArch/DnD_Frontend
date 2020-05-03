@@ -6,6 +6,7 @@ import { RestServiceService } from '../../../shared/rest-service.service';
 import { postlogin } from '../../../class/postlogin';
 import { FileUploader } from 'ng2-file-upload';
 import { userlogin } from '../../../class/userlogin';
+import { ToastrService } from 'ngx-toastr';
 
 const URL = 'http://93.55.227.222:9001/DeDManager/upload';
 
@@ -16,7 +17,7 @@ const URL = 'http://93.55.227.222:9001/DeDManager/upload';
 })
 export class HomeComponent {
 
-    constructor(private headserv: HeaderChangeService, private shared: SharedVariableService, private sanitizer: DomSanitizer, private rest: RestServiceService) {
+    constructor(private headserv: HeaderChangeService, private shared: SharedVariableService, private sanitizer: DomSanitizer, private rest: RestServiceService, private Tosat: ToastrService) {
 
         this.rest.chooseCharacter('', 0).subscribe(res => {
             this.shared.character = res; console.log(res);
@@ -56,6 +57,6 @@ export class HomeComponent {
     }
     onCharacterInvite(username){
         let a :userlogin[]=[new userlogin(username,'','')];
-        this.rest.invitePLayer(a).subscribe(res=>console.log(res));
+        this.rest.invitePLayer(a).subscribe(res=>this.Tosat.success('The player '+username+" was invited with success."),err=>{this.Tosat.error("Something went wrong, please try again in a minute.")});
     }
 }

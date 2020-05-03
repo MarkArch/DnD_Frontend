@@ -61,6 +61,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { FileSelectDirective } from 'ng2-file-upload';
 import { NewCharacterComponent } from './views/new-character/new-character.component';
 import { DungeonComponent } from './views/main/dungeon/dungeon.component';
+import { ResetPassComponent } from './views/reset-pass/reset-pass.component';
 export function getAuthServiceConfigs() {
   let config = new AuthServiceConfig(
       [
@@ -107,7 +108,8 @@ export function getAuthServiceConfigs() {
     LoginComponent,
     RegisterComponent,
     CampaignSelectComponent,
-    NewCharacterComponent
+    NewCharacterComponent,
+    ResetPassComponent
   ],
   providers: [{
     provide: LocationStrategy,

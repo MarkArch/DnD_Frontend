@@ -13,6 +13,7 @@ var grid_component_1 = require("./grid/grid.component");
 var diary_component_1 = require("./diary/diary.component");
 var sheet_component_1 = require("./sheet/sheet.component");
 var dungeon_component_1 = require("./dungeon/dungeon.component");
+var video_chat_component_1 = require("./video_chat/video_chat.component");
 var routes = [
     {
         path: '',
@@ -39,6 +40,10 @@ var routes = [
     {
         path:'dungeon',
         component:dungeon_component_1.DungeonComponent,
+    },
+    {
+        path:'video_chat',
+        component:video_chat_component_1.Video_chatComponent,
     }
 ];
 var MainRoutingModule = /** @class */ (function () {

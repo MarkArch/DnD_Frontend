@@ -7,6 +7,7 @@ import { DiaryComponent } from './diary/diary.component';
 import { SheetComponent } from './sheet/sheet.component';
 import { AuthGuardService } from '../../shared/auth-guard.service';
 import { DungeonComponent } from './dungeon/dungeon.component';
+import { VideoChatComponent } from './video-chat/video-chat.component';
 
 const routes: Routes = [
   {
@@ -34,6 +35,10 @@ const routes: Routes = [
   }, {
     path: 'dungeon',
     component: DungeonComponent
+  },
+  {
+    path:'video_chat',
+    component: VideoChatComponent
   }
 ];
 

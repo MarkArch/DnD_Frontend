@@ -1,0 +1,37 @@
+<div class="app-body">
+    <main class="main d-flex align-items-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 mx-auto">
+            <div class="card mx-4">
+              <div class="card-body p-4">
+                <h1>Reset your password</h1>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">@</span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="Email" #email [ngStyle]="{'border':emailFlag?'1px solid #ff0000':none}">
+                </div>
+                <div>
+                  <button type="button"class="btn btn-danger" (click)="back()" style="margin-left:5%;margin-right: 5%;width:40%">Back</button>
+                  <button type="button" class="btn btn-success" style="margin-left:5%;margin-right: 5%;width:40%" (click)="register(username.value,email.value,password.value,password1.value)">Continue</button>
+                </div>
+                
+              </div>
+              <!-- <div class="card-footer p-4">
+                <div class="row">
+                  <div class="col-6">
+                    <button class="btn btn-block btn-facebook" type="button"><span>facebook</span></button>
+                  </div>
+                  <div class="col-6">
+                    <button class="btn btn-block btn-twitter" type="button"><span>twitter</span></button>
+                  </div>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  

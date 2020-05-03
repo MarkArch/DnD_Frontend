@@ -13,6 +13,7 @@ import { DiaryComponent } from './diary/diary.component';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { FileSelectDirective } from 'ng2-file-upload';
 import { DungeonComponent } from './dungeon/dungeon.component';
+import { VideoChatComponent } from './video-chat/video-chat.component';
 
 @NgModule({
   imports: [
@@ -27,6 +28,6 @@ import { DungeonComponent } from './dungeon/dungeon.component';
   ],
   declarations: [
     HomeComponent,
-    GridComponent, SheetComponent, DiaryComponent, FileSelectDirective,DungeonComponent]
+    GridComponent, SheetComponent, DiaryComponent, FileSelectDirective,DungeonComponent, VideoChatComponent]
 })
 export class MainModule { }

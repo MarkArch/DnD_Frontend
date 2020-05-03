@@ -74,5 +74,7 @@ export class LoginComponent implements OnInit {
       this.onLogin(username,password);
     }
   }
-
+ passReset(){
+   this.router.navigate(['/resetPass']);
+ }
 }

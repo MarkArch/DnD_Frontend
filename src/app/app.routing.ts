@@ -13,6 +13,7 @@ import { HomeComponent } from './views/main/home/home.component';
 import { CampaignSelectComponent } from './views/campaign-select/campaign-select.component';
 import { NewCharacterComponent } from './views/new-character/new-character.component';
 import { DungeonComponent } from './views/main/dungeon/dungeon.component';
+import { ResetPassComponent} from './views/reset-pass/reset-pass.component';
 
 export const routes: Routes = [
   {
@@ -39,6 +40,13 @@ export const routes: Routes = [
     component: RegisterComponent,
     data: {
       title: 'Register Page'
+    }
+  },
+  {
+    path: 'resetPass',
+    component: ResetPassComponent,
+    data: {
+      title: 'Reset Password'
     }
   },
   {
