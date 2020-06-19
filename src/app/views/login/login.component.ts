@@ -4,6 +4,11 @@ import { RestServiceService } from '../../shared/rest-service.service';
 import { postlogin } from '../../class/postlogin';
 import { SharedVariableService } from '../../shared/shared-variable.service';
 import { FacebookService, InitParams, LoginResponse, LoginStatus, LoginOptions } from 'ngx-facebook';
+import * as SockJS from 'sockjs-client';
+import * as Stomp from 'stompjs';
+
+
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: 'login.component.html'
@@ -23,6 +28,15 @@ export class LoginComponent implements OnInit {
       version: 'v3.2'
     };
     fb.init(initParams);
+ /*   const socket = new SockJS('http://93.55.227.222:9001/gs-guide-websocket');
+    let stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+      stompClient.send('/app/hello/1',{},JSON.stringify({'name':'prova'}))
+      stompClient.subscribe('/topic/greetings/1', function (hello) {
+        alert(hello)
+      });
+      stompClient.send('/app/hello/1',{},JSON.stringify({'name':'prova'}))
+    });*/
   }
   onRegister() {
     this.router.navigate(['/register']);
@@ -30,9 +44,9 @@ export class LoginComponent implements OnInit {
 
   onLogin(username, password) {
     //this.router.navigate(['/campaign']);
-    this.service.login(username, password).subscribe((res:String) => {
+    this.service.login(username, password).subscribe((res:any) => {
       console.log(res);
-      if(res=='true'){
+      if(res.changeCharName=='true'){
         this.router.navigate(['/newCharacter']);
       }else{
       this.router.navigate(['/campaign']);
@@ -75,6 +89,6 @@ export class LoginComponent implements OnInit {
     }
   }
  passReset(){
-   this.router.navigate(['/resetPass']);
+  this.router.navigate(['/resetPass']);
  }
 }

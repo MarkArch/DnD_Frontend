@@ -16,8 +16,13 @@ import { timeout } from 'q';
 import { postlogin } from '../../../class/postlogin';
 import { sessionEnum } from '../../../class/sessionEnum';
 // import { ChangeDetectorRef } from '@angular/core';
+import * as SockJS from 'sockjs-client';
+import * as Stomp from 'stompjs';
+import { dice } from '../../../class/dice';
+
 
 const URL = 'http://192.168.1.62:8080/DeDManager/upload';
+const socket = new SockJS('http://93.55.227.222:9001/gs-guide-websocket');
 
 @Component({
   selector: 'app-grid',
@@ -57,15 +62,155 @@ const URL = 'http://192.168.1.62:8080/DeDManager/upload';
 })
 
 export class GridComponent implements OnInit, OnDestroy {
+  public stompClient;
+
 
 
   constructor(private shared: SharedVariableService, private cookie: CookieService, private router: Router, private service: RestServiceService, private shareVariable: SharedVariableService, private toastr: ToastrService) {
     this.service.chooseCharacter("", 0).subscribe(res => {
       this.service.accounts().subscribe((res: postlogin[]) => {
-        this.accounts = res; console.log(this.accounts)
+        this.accounts = res; console.log("account", this.accounts)
       });
       this.shared.character = res; this.character = this.shared.character;
       console.log(this.character);
+      this.stompClient = Stomp.over(socket);
+      const that = this;
+      this.stompClient.connect({}, function (frame) {
+        that.stompClient.subscribe('/topic/ping/' + that.character.session_id, function (hello) {
+          console.log("x:" + hello.body.x)
+          console.log("y:" + hello.body.y)
+          let b = JSON.parse(hello.body)
+          that.ping = b
+          let a: grid = new grid();
+          a.x = 99;
+          a.y = 99;
+          that.ping = b;
+          setTimeout(() => {
+            that.ping = a;
+          }, 300);
+          setTimeout(() => {
+            that.ping = b;
+          }, 600);
+          setTimeout(() => {
+            that.ping = a;
+          }, 900);
+          setTimeout(() => {
+            that.ping = b;
+          }, 1200);
+          setTimeout(() => {
+            that.ping = a;
+          }, 1500);
+        });
+        that.stompClient.subscribe('/topic/movePg/' + that.character.session_id, function (hello) {
+          console.log("qualcuno si è mosso", hello)
+          console.log("griglia prima spostamento", that.grid)
+          let pgMosso = JSON.parse(hello.body);
+          if (pgMosso.charName == "tree" || pgMosso.charName == "vertical wall" || pgMosso.charName == "horizontal wall" || pgMosso.charName == "dungeon" || pgMosso.charName == "door-closed") {
+            that.grid.push(pgMosso)
+          } else {
+            console.log("il pg che si è mosso", pgMosso)
+            let found = false;
+            for (let i = 0; i < that.grid.length; i++) {
+              if (that.grid[i].charName == pgMosso.charName) {
+                that.grid[i] = pgMosso;
+                found = true;
+              }
+            }
+            if (!found) {
+              that.grid.push(pgMosso)
+            }
+            if (that.charecterPosition.charName == pgMosso.charName) {
+              that.charecterPosition = pgMosso
+            }
+
+          }
+          console.log("griglia dopo spostamento", that.grid)
+          that.service.getPossibleViews("50").subscribe((res: grid[]) => {
+            console.log("possible views", res),
+            that.possibleViews = res;
+            that.minX = that.possibleViews[0].x;
+            that.minY = that.possibleViews[0].y;
+            that.maxX = that.possibleViews[3].x;
+            that.maxY = that.possibleViews[3].y;
+          });
+        })
+        that.stompClient.subscribe('/topic/updatePg/' + that.character.session_id, function (hello) {
+          let newPg = JSON.parse(hello.body)
+          for (let i = 0; i < that.sessionPlayers.length; i++) {
+            if (that.sessionPlayers[i].charName == newPg.charName) {
+              that.sessionPlayers[i] = newPg
+            }
+          }
+          that.tooltip=[];
+          that.sessionPlayers.forEach(p => {
+            let healthStatus = '';
+            if ((p.current_hp / p.hp) > 0.80) {
+              healthStatus = 'Healthy'
+            } else if ((p.current_hp / p.hp) > 0.50) {
+              healthStatus = 'Quite healthy'
+            } else if ((p.current_hp / p.hp) > 0.25) {
+              healthStatus = 'Damaged'
+            } else if ((p.current_hp / p.hp) > 0) {
+              healthStatus = 'Really Damaged'
+            } else {
+              healthStatus = 'To the ground'
+            };
+            that.tooltip.push("The Player  " + p.gridNumber + " is with Current HP: " + healthStatus);
+            that.inGrid.push(false);
+            that.isFriend.push(false);
+          })
+        })
+
+        that.stompClient.subscribe('/topic/diceThrow/' + that.character.session_id, function (hello) {
+          let res = JSON.parse(hello.body);
+          that.diceThrow = res.ref_charName + " ha tirato un " + res.dice_type + " facendo un bel " + res.dice_value;
+          that.toastr.info(that.diceThrow);
+        });
+        that.stompClient.subscribe('/topic/notification/' + that.character.session_id, function (hello) {
+          let res = hello.body;
+          that.toastr.info("the master says " + res);
+        });
+        that.stompClient.subscribe('/topic/turn/' + that.character.session_id, function (hello) {
+          that.service.getTurn().subscribe(res => {
+            that.turn = +res;
+            while (that.turn >= that.sessionPlayers.length) {
+              that.turn = that.turn - that.sessionPlayers.length;
+            }
+  
+        });
+      })
+        that.stompClient.subscribe('/topic/deletePg/' + that.character.session_id, function (hello) {
+          let res = JSON.parse(hello.body);
+          console.log("ehi leva sto coso:",res)
+          for (let i = 0; i < that.grid.length; i++) {
+            if (that.grid[i].x == res.x && that.grid[i].y == res.y) {
+              that.grid.splice(i, 1)
+            }
+          }
+          console.log("la grid dopo il remove",that.grid)
+        });
+
+        that.stompClient.subscribe('/topic/empty/' + that.character.session_id, function (hello) {
+          let res = hello.body;
+          let new_grid:grid[]= []
+          if(res=="objects"){
+            for(let i=0;i<that.grid.length;i++){
+              if (that.grid[i].charName != "tree" && that.grid[i].charName != "vertical wall" && that.grid[i].charName != "horizontal wall" && that.grid[i].charName != "dungeon" && that.grid[i].charName != "door-closed"){
+                new_grid.push(that.grid[i])
+              }
+            }
+          }
+          else if(res=="characters"){
+            for(let i=0;i<that.grid.length;i++){
+              if (that.grid[i].charName == "tree" || that.grid[i].charName == "vertical wall" || that.grid[i].charName == "horizontal wall" || that.grid[i].charName == "dungeon" || that.grid[i].charName == "door-closed") {
+                new_grid.push(that.grid[i])
+              }
+            }
+          }
+          that.grid=new_grid
+        });
+      })
+      console.log(this.ping)
       this.service.getPossibleViews("50").subscribe((res: grid[]) => {
         console.log("possible views", res),
           this.possibleViews = res;
@@ -85,7 +230,8 @@ export class GridComponent implements OnInit, OnDestroy {
             this.charecterPosition.y = position.y;
           }
         }
-        this.syncroPositions();
+        console.log("stampo la griglia", this.grid)
+        // this.syncroPositions();
       });
       this.service.getCharacterList().subscribe(res => {
         console.log("informazioni pg");
@@ -104,7 +250,7 @@ export class GridComponent implements OnInit, OnDestroy {
           } else {
             healthStatus = 'To the ground'
           };
-          this.tooltip.push("The Player  "+p.gridNumber+" is with Current HP: " + healthStatus);
+          this.tooltip.push("The Player  " + p.gridNumber + " is with Current HP: " + healthStatus);
           this.inGrid.push(false);
           this.isFriend.push(false);
         })
@@ -139,10 +285,10 @@ export class GridComponent implements OnInit, OnDestroy {
             this.turn = this.turn - this.sessionPlayers.length;
           }
 
-          this.syncroTurn();
-          this.syncroCharacter();
-          this.syncroDice();
-          this.syncroPing();
+          //this.syncroTurn();
+          //this.syncroCharacter();
+          // this.syncroDice();
+          // this.syncroPing();
           //  this.syncroBuff();
         });
       });
@@ -162,7 +308,9 @@ export class GridComponent implements OnInit, OnDestroy {
   possibleMoves: grid[] = [];
   possibleViews: grid[] = [];
   charecterPosition: grid = new grid();
-  ping: grid = { charName: "", x: 99, y: 99 };
+  ping: grid = {
+    charName: "", x: 99, y: 99
+  };
   setObjectOnGrid = false;
   deleteObjectFromGrid = false;
   objectName: String = "";
@@ -189,7 +337,7 @@ export class GridComponent implements OnInit, OnDestroy {
   maxY = 0;
   clickStart: grid = new grid();
   clickEnd: grid = new grid();
-  isIntermittent=false;
+  isIntermittent = false;
   public isFriend = [];
   public inModify = false;
   public inGrid = [];
@@ -211,51 +359,48 @@ export class GridComponent implements OnInit, OnDestroy {
   public stats: { name: string, value: number, modifier: number, tempValue: number, buffModifier: number, totValue: number, savingThrow: number }[] = [];
 
 
-
-
   ngOnInit() {
   }
 
   onNextTurn() {
-    if (this.inModify=== false) {
+    if (this.inModify === false) {
       this.service.getNextTurn().subscribe((res: number) => {
-        console.log(res);
-        this.turn = res; 
+        this.stompClient.send('/app/turn/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, this.turn);
       });
     }
   }
-  syncroPositions() {
-    this.syncroPositionsSubscription = this.service.syncroPositions().subscribe((res: String) => {
-      console.log(res);
-      this.possibleMoves = [];
-      if (res == 'positions') {
-        this.service.getPositions().subscribe((res: grid[]) => {
-          this.grid = res; for (let position of this.grid) {
-            if (position.charName == this.character.charName) {
-              this.charecterPosition.charName = position.charName;
-              this.charecterPosition.x = position.x;
-              this.charecterPosition.y = position.y;
-            }
-          }
-          this.service.getPossibleViews("50").subscribe((res: grid[]) => {
-            console.log("possible views", res),
-              this.possibleViews = res;
-            this.minX = this.possibleViews[0].x;
-            this.minY = this.possibleViews[0].y;
-            this.maxX = this.possibleViews[3].x;
-            this.maxY = this.possibleViews[3].y;
-          });
-          this.syncroPositions();
-        });
-      } else if (res == 'notification') {
-        this.service.getNotification().subscribe(res => {
-          console.log(res);
-          this.toastr.info('The Master say: ' + res);
-          this.syncroPositions();
-        })
-      }
-    });
-  }
+  // syncroPositions() {
+  //   this.syncroPositionsSubscription = this.service.syncroPositions().subscribe((res: String) => {
+  //     console.log(res);
+  //     this.possibleMoves = [];
+  //     if (res == 'positions') {
+  //       this.service.getPositions().subscribe((res: grid[]) => {
+  //         this.grid = res; for (let position of this.grid) {
+  //           if (position.charName == this.character.charName) {
+  //             this.charecterPosition.charName = position.charName;
+  //             this.charecterPosition.x = position.x;
+  //             this.charecterPosition.y = position.y;
+  //           }
+  //         }
+  //         this.service.getPossibleViews("50").subscribe((res: grid[]) => {
+  //           console.log("possible views", res),
+  //             this.possibleViews = res;
+  //           this.minX = this.possibleViews[0].x;
+  //           this.minY = this.possibleViews[0].y;
+  //           this.maxX = this.possibleViews[3].x;
+  //           this.maxY = this.possibleViews[3].y;
+  //         });
+  //         this.syncroPositions();
+  //       });
+  //     } else if (res == 'notification') {
+  //       this.service.getNotification().subscribe(res => {
+  //         console.log(res);
+  //         this.toastr.info('The Master say: ' + res);
+  //         this.syncroPositions();
+  //       })
+  //     }
+  //   });
+  // }
   searchCharacterOnGrid(x, y): String {
     let a = "";
     this.grid.forEach(char => {
@@ -435,8 +580,13 @@ export class GridComponent implements OnInit, OnDestroy {
 
   onChangeAttribute(name: String, value: String) {
     this.service.updatePg(name, value).subscribe((res: character) => {
-      this.toastr.success('Your update was successful'); this.character = res; this.statInitializer(); this.x = +this.character.grid_dimension.substring(0, this.character.grid_dimension.indexOf(','));
-      this.y = +this.character.grid_dimension.substring(this.character.grid_dimension.indexOf(',') + 1); this.onGridInit();
+      this.toastr.success('Your update was successful');
+      this.character = res;
+      this.statInitializer();
+      this.x = +this.character.grid_dimension.substring(0, this.character.grid_dimension.indexOf(','));
+      this.y = +this.character.grid_dimension.substring(this.character.grid_dimension.indexOf(',') + 1);
+      this.onGridInit();
+      this.stompClient.send('/app/updatePg/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(this.character));
     }, err => { this.toastr.error('Something went wrong, please try again later') });
   }
 
@@ -453,7 +603,12 @@ export class GridComponent implements OnInit, OnDestroy {
           temp += Math.ceil(Math.random() * 20);
         }
         this.diceArray[i].value = temp;
-        this.service.throwDice("d20", this.diceArray[i].value).subscribe();
+        let d: dice = new dice();
+        d.ref_charName = this.character.charName;
+        d.ref_session_id = this.character.session_id
+        d.dice_type = "d20"
+        d.dice_value = this.diceArray[i].value
+        this.stompClient.send('/app/diceThrow/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(d));
         break;
       }
       case 1: {
@@ -461,7 +616,12 @@ export class GridComponent implements OnInit, OnDestroy {
           temp += Math.ceil(Math.random() * 12);
         }
         this.diceArray[i].value = temp;
-        this.service.throwDice("d12", this.diceArray[i].value).subscribe();
+        let d: dice = new dice();
+        d.ref_charName = this.character.charName;
+        d.ref_session_id = this.character.session_id
+        d.dice_type = "d12"
+        d.dice_value = this.diceArray[i].value
+        this.stompClient.send('/app/diceThrow/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(d));
         break;
       }
       case 2: {
@@ -469,7 +629,12 @@ export class GridComponent implements OnInit, OnDestroy {
           temp += Math.ceil(Math.random() * 10);
         }
         this.diceArray[i].value = temp;
-        this.service.throwDice("d10", this.diceArray[i].value).subscribe();
+        let d: dice = new dice();
+        d.ref_charName = this.character.charName;
+        d.ref_session_id = this.character.session_id
+        d.dice_type = "d10"
+        d.dice_value = this.diceArray[i].value
+        this.stompClient.send('/app/diceThrow/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(d));
         break;
       }
       case 3: {
@@ -477,7 +642,12 @@ export class GridComponent implements OnInit, OnDestroy {
           temp += Math.ceil(Math.random() * 8);
         }
         this.diceArray[i].value = temp;
-        this.service.throwDice("d8", this.diceArray[i].value).subscribe();
+        let d: dice = new dice();
+        d.ref_charName = this.character.charName;
+        d.ref_session_id = this.character.session_id
+        d.dice_type = "d8"
+        d.dice_value = this.diceArray[i].value
+        this.stompClient.send('/app/diceThrow/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(d));
         break;
       }
       case 4: {
@@ -485,7 +655,12 @@ export class GridComponent implements OnInit, OnDestroy {
           temp += Math.ceil(Math.random() * 6);
         }
         this.diceArray[i].value = temp;
-        this.service.throwDice("d6", this.diceArray[i].value).subscribe();
+        let d: dice = new dice();
+        d.ref_charName = this.character.charName;
+        d.ref_session_id = this.character.session_id
+        d.dice_type = "d6"
+        d.dice_value = this.diceArray[i].value
+        this.stompClient.send('/app/diceThrow/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(d));
         break;
       }
       case 5: {
@@ -493,7 +668,12 @@ export class GridComponent implements OnInit, OnDestroy {
           temp += Math.ceil(Math.random() * 4);
         }
         this.diceArray[i].value = temp;
-        this.service.throwDice("d4", this.diceArray[i].value).subscribe();
+        let d: dice = new dice();
+        d.ref_charName = this.character.charName;
+        d.ref_session_id = this.character.session_id
+        d.dice_type = "d4"
+        d.dice_value = this.diceArray[i].value
+        this.stompClient.send('/app/diceThrow/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(d));
         break;
       }
       case 6: {
@@ -501,7 +681,12 @@ export class GridComponent implements OnInit, OnDestroy {
           temp += Math.ceil(Math.random() * 100);
         }
         this.diceArray[i].value = temp;
-        this.service.throwDice("d%", this.diceArray[i].value).subscribe();
+        let d: dice = new dice();
+        d.ref_charName = this.character.charName;
+        d.ref_session_id = this.character.session_id
+        d.dice_type = "d%"
+        d.dice_value = this.diceArray[i].value
+        this.stompClient.send('/app/diceThrow/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(d));
         break;
       }
     }
@@ -558,24 +743,57 @@ export class GridComponent implements OnInit, OnDestroy {
     if (this.charecterPosition.x == x && this.charecterPosition.y == y) {
       this.service.getPossibleMoves(this.character.speed.toString()).subscribe((res: grid[]) => { this.possibleMoves = res });
     } else if ((this.charecterPosition.x != x || this.charecterPosition.y != y) && cell.style.backgroundColor == 'silver') {
-      this.service.movePg(x, y).subscribe();
+      this.service.movePg(x, y).subscribe(res => {
+        let g: grid = new grid();
+        g.charName = this.character.charName
+        g.x = x;
+        g.y = y;
+        this.stompClient.send('/app/movePg/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(g));
+      });
       this.possibleMoves = [];
     } else if (this.settingOnGrid) {
-      this.service.movePg(x, y).subscribe();
+      this.service.movePg(x, y).subscribe(res => {
+        let g: grid = new grid();
+        g.charName = this.character.charName
+        g.x = x;
+        g.y = y;
+        this.stompClient.send('/app/movePg/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(g));
+      });
       for (let i = 0; i < this.inGrid.length; i++) {
         this.inGrid[i] = false;
       }
       this.settingOnGrid = false;
       this.possibleMoves = [];
-      this.onChangeAttribute('alive', '1');
+      if (!this.character.alive) {
+        this.onChangeAttribute('alive', '1');
+      }
+
     } else if (this.setObjectOnGrid == true) {
-      this.service.setObjectOnGrid(this.objectName, x, y).subscribe();
+      this.service.setObjectOnGrid(this.objectName, x, y).subscribe(res => {
+        let g: grid = new grid();
+        g.charName = this.objectName
+        g.x = x;
+        g.y = y;
+        this.stompClient.send('/app/movePg/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(g));
+      });
     } else if (this.deleteObjectFromGrid == true) {
-      this.service.deleteObjectOnGrid("", x, y).subscribe();
+      this.service.deleteObjectOnGrid("", x, y).subscribe(res => {
+        let g: grid = new grid();
+        g.charName = this.objectName
+        g.x = x;
+        g.y = y;
+        this.stompClient.send('/app/deletePg/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(g));
+      });
     } else if (this.pingTimes < 3) {
-      this.service.pingGrid(x, y).subscribe(res => { if (this.character.privilege == 'user') this.pingTimes += 1 });
-      if (this.pingTimes == 3)
-        setTimeout(() => { this.pingTimes = 0 }, 60000);
+      // this.service.pingGrid(x, y).subscribe(res => { if (this.character.privilege == 'user') this.pingTimes += 1 });
+      // if (this.pingTimes == 3)
+      //   setTimeout(() => { this.pingTimes = 0 }, 60000);
+
+      let g: grid = new grid();
+      g.x = x;
+      g.y = y;
+      this.stompClient.send('/app/ping/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(g));
+      console.log(this.ping)
     }
   }
 
@@ -590,7 +808,7 @@ export class GridComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSaveInitiative(initiative,gridNumber) {
+  onSaveInitiative(initiative, gridNumber) {
     this.character.initiative = initiative;
     this.character.gridNumber = gridNumber;
     this.onChangeAttribute('initiative', this.character.initiative.toString());
@@ -640,30 +858,27 @@ export class GridComponent implements OnInit, OnDestroy {
     }
   }
 
-  syncroPing() {
-    this.syncroPingSubcription = this.service.syncroPing().subscribe((res: grid) => {
-      let a: grid = new grid();
-      a.x = 99;
-      a.y = 99;
-      this.ping = res;
-      setTimeout(() => {
-        this.ping = a;
-      }, 300);
-      setTimeout(() => {
-        this.ping = res;
-      }, 600);
-      setTimeout(() => {
-        this.ping = a;
-      }, 900);
-      setTimeout(() => {
-        this.ping = res;
-      }, 1200);
-      setTimeout(() => {
-        this.ping = a;
-      }, 1500);
-      this.syncroPing();
-    });
-  }
+  // public static gridPing(res) {
+  //     let a: grid = new grid();
+  //     a.x = 99;
+  //     a.y = 99;
+  //     this.ping = res;
+  //     setTimeout(() => {
+  //       this.ping = a;
+  //     }, 300);
+  //     setTimeout(() => {
+  //       this.ping = res;
+  //     }, 600);
+  //     setTimeout(() => {
+  //       this.ping = a;
+  //     }, 900);
+  //     setTimeout(() => {
+  //       this.ping = res;
+  //     }, 1200);
+  //     setTimeout(() => {
+  //       this.ping = a;
+  //     }, 1500);
+  // }
   onSetObjectOnGrid() {
     if (this.setObjectOnGrid == true) {
       this.setObjectOnGrid = false;
@@ -681,27 +896,34 @@ export class GridComponent implements OnInit, OnDestroy {
     }
   }
   onGridEmpty() {
-    this.service.emptyGrid().subscribe(res => { this.charecterPosition.x = null; this.charecterPosition.y = null });
+    this.service.emptyGrid().subscribe(res => {
+      this.charecterPosition.x = null;
+      this.charecterPosition.y = null
+      this.stompClient.send('/app/empty/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, "characters");
+
+    });
   }
   onObjectGridEmpty() {
-    this.service.emptyObjectGrid().subscribe();
+    this.service.emptyObjectGrid().subscribe(res => {
+      this.stompClient.send('/app/empty/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, "objects");
+    });
   }
   onSetBuff(charNameTo, stat, intensity, lastFor, type) {
     this.service.postBuff(this.character.charName, charNameTo, stat, intensity, lastFor, type).subscribe(res => { this.toastr.success('You buff was successful') }, err => { this.toastr.error('Something went wrong, please try again later') });
   }
   ngOnDestroy(): void {
-    this.syncroCharacterSubscription.unsubscribe();
-    this.syncroDiceSubscription.unsubscribe();
-    this.syncroPositionsSubscription.unsubscribe();
-    this.syncroTurnSubscription.unsubscribe();
-    this.syncroPingSubcription.unsubscribe();
+    //this.syncroCharacterSubscription.unsubscribe();
+    //this.syncroDiceSubscription.unsubscribe();
+    //this.syncroPositionsSubscription.unsubscribe();
+    //this.syncroTurnSubscription.unsubscribe();
+    //this.syncroPingSubcription.unsubscribe();
   }
   tryToastrNotification() {
     this.toastr.success('Hello World');
   }
   onKeydown(event, value) {
     if (event.key === "Enter") {
-      this.service.postNotification(value).subscribe();
+      this.stompClient.send('/app/notification/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, value);
     }
   }
   onChange(event) {
@@ -742,40 +964,51 @@ export class GridComponent implements OnInit, OnDestroy {
     for (let a = xMin; a <= xMax; a++) {
       for (let b = yMin; b <= yMax; b++) {
         if (this.setObjectOnGrid == true) {
-          this.service.setObjectOnGrid(this.objectName, a, b).subscribe();
+          this.service.setObjectOnGrid(this.objectName, a, b).subscribe(res => {
+            let g: grid = new grid();
+            g.charName = this.objectName
+            g.x = a;
+            g.y = b;
+            this.stompClient.send('/app/movePg/' + this.character.session_id, { "Cookie": "LoggedCharacter=A" }, JSON.stringify(g));
+          });
         }
       }
     }
   }
-  onSearchCharacterHp(x,y){
-    let a=99;
-    this.grid.forEach(g=>{
-      if(g.x==x && g.y==y){
-        this.sessionPlayers.forEach(p=>{
-          if(p.charName==g.charName){
-            a=p.current_hp;
+  onSearchCharacterHp(x, y) {
+    let a = 99;
+    this.grid.forEach(g => {
+      if (g.x == x && g.y == y && this.sessionPlayers != null && this.sessionPlayers.length > 0) {
+        this.sessionPlayers.forEach(p => {
+          if (p.charName == g.charName) {
+            a = p.current_hp;
           }
         })
       }
     })
     return a;
   }
-  onDeadPlayer(){
-    setInterval(()=>{
-      this.isIntermittent=!this.isIntermittent;
-    },700)
+  onDeadPlayer() {
+    setInterval(() => {
+      this.isIntermittent = !this.isIntermittent;
+    }, 700)
   }
-  onSearchMasterCharacter(x,y){
-    let a='';
-    this.grid.forEach(g=>{
-      if(g.x==x && g.y==y){
-        this.sessionPlayers.forEach(p=>{
-          if(p.privilege=='master' && g.charName.includes('nemy')){
-            a=g.charName.substring(5);
-          }
-        })
-      }
-    })
+  onSearchMasterCharacter(x, y) {
+    let a = '';
+    if (this.grid != null) {
+      this.grid.forEach(g => {
+        if (g.x == x && g.y == y && this.sessionPlayers != null) {
+          this.sessionPlayers.forEach(p => {
+            if (p.privilege == 'master' && g.charName.includes('nemy')) {
+              a = g.charName.substring(5);
+            }
+          })
+        }
+      })
+    }
     return a;
+  }
+  initiativeOrder() {
+    return this.sessionPlayers == null ? this.sessionPlayers : this.sessionPlayers.sort((a, b) => a["initiative"] > b["initiative"] ? -1 : a["initiative"] === b["initiative"] ? 0 : 1)
   }
 }

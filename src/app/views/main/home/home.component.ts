@@ -28,9 +28,11 @@ export class HomeComponent {
                 (err: any) => this.image = '/assets/img/no_img.PNG');
             this.rest.accounts().subscribe((res: postlogin[]) => {
                 res.forEach(r => { if (r.session_id == this.shared.character.session_id) { this.sessionName = r.session_name } });
-                this.rest.getCharacterList().subscribe(res => { this.characterList = res });
+                this.rest.getCharacterList().subscribe((res:any) => { this.characterList = res });
             });
-            this.rest.getUsersList().subscribe((res: String[]) => this.usersList = res);
+            this.rest.getUsersList().subscribe((res:any) => //alert(res.context.entity)
+            this.usersList = res
+            );
         })
 
     }

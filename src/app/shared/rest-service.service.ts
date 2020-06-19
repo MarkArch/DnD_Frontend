@@ -153,4 +153,8 @@ export class RestServiceService {
   updateCharName(charname){
     return this.http.post("http://93.55.227.222:9001/DeDManager/updatePg/charName/", charname, { withCredentials: true })
   }
+  resetPassword(email: String) {
+    return this.http.post("http://93.55.227.222:9001/DeDManager/resetPassword/", email)
+  }
+
 }

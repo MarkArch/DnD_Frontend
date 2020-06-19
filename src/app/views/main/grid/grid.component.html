@@ -153,7 +153,7 @@
                     (click)="character.show_all==true?onChangeAttribute('show_all',0):onChangeAttribute('show_all',1)"
                     class="btn btn-outline-primary btn-block">Hide/Show full character list</button></td>
               </tr>
-              <tr *ngFor="let pg of sessionPlayers; let ind=index">
+              <tr *ngFor="let pg of initiativeOrder(); let ind=index">
                 <ng-container *ngIf="this.character.show_all==false">
                   <td class="pr-2 pl-2 pb-1 text-center"><i *ngIf="ind==turn" class="fas fa-caret-right"></i></td>
                   <td class="pr-2 pl-2 pb-1 text-center highFont"><span [tooltip]="tooltip[ind]" triggers="click"
@@ -169,7 +169,8 @@
                   <td [hidden]="inModify" class="pr-2 pl-2 pb-1 text-center highFont">Grid: {{pg.gridNumber}}</td>
                   <td [hidden]="!inModify || pg.charName!=character.charName"
                     class="pr-2 pl-2 pb-1 text-center highFont">
-                    <input class="HPdim" type="text" style="direction: rtl" [(ngModel)]="pg.gridNumber"
+                    <input class="HPdim" type="text"
+                     [(ngModel)]="pg.gridNumber"
                       value="{{pg.gridNumber}}">
                   </td>
                   <ng-container *ngIf="pg.charName==character.charName">
